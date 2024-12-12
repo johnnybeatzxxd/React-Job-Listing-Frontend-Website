@@ -79,7 +79,33 @@ export function HomePage(){
         
             </HomeBody>
             <Footer>
-
+                <Foot>
+                    <FooterContent>
+                        <FooterSection>
+                            <img src={Finance} alt="Jobpilot" style={{ height: '30px' }} />
+                            <div>Call now: (+251) 977276556 </div>
+                            
+                        </FooterSection>
+                        {footerLinks.map((section, index) => (
+                            <FooterSection key={index}>
+                                <FooterTitle>{section.title}</FooterTitle>
+                                {section.links.map((link, linkIndex) => (
+                                    <FooterLink key={linkIndex} href={link.href}>{link.name}</FooterLink>
+                                ))}
+                            </FooterSection>
+                        ))}
+                         <FooterBottom>
+                        <Copyright>© 2024 Jobpilot - Job Portal. All rights Reserved</Copyright>
+                        <SocialLinks>
+                            <FooterLink href="#"><i className="fab fa-facebook-f"></i></FooterLink>
+                            <FooterLink href="#"><i className="fab fa-youtube"></i></FooterLink>
+                            <FooterLink href="#"><i className="fab fa-instagram"></i></FooterLink>
+                            <FooterLink href="#"><i className="fab fa-twitter"></i></FooterLink>
+                        </SocialLinks>
+                    </FooterBottom>
+                    </FooterContent>
+                   
+                </Foot>
             </Footer>
         </Home>
     )
@@ -246,3 +272,91 @@ const CategoryPositions = styled.span`
     color: #666;
     font-size: 0.9rem;
 `
+const Footer = styled.div`
+    display: flex;
+    flex-direction: row-reverse;
+    flex: 1;
+    width: 100%;
+    height:40%;
+    background-color: #18191C;
+`
+const Foot = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-self: end;
+    width: 90.5%;
+    height: 100%;
+    color: white;
+    padding: 40px 0;
+`
+
+const FooterContent = styled.div`
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 40px;
+`
+
+const FooterSection = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+`
+
+const FooterTitle = styled.h3`
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0;
+`
+
+const FooterLink = styled.a`
+    color: #9CA3AF;
+    text-decoration: none;
+    font-size: 0.9rem;
+    &:hover {
+        color: white;
+    }
+`
+
+const FooterBottom = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
+    background-color: #18191C;
+    border-top: 1px solid #333;
+`
+
+const Copyright = styled.p`
+    color: #9CA3AF;
+    font-size: 0.9rem;
+    margin: 0;
+`
+
+const SocialLinks = styled.div`
+    display: flex;
+    gap: 16px;
+`
+
+const footerLinks = [
+   
+    {
+        title: "Candidate",
+        links: [
+            { name: "Browse Jobs", href: "#" },
+            { name: "Browse Employers", href: "#" },
+            { name: "Candidate Dashboard", href: "#" },
+            { name: "Saved Jobs", href: "#" },
+        ],
+    },
+    {
+        title: "Employers",
+        links: [
+            { name: "Post a Job", href: "#" },
+            { name: "Browse Candidates", href: "#" },
+            { name: "Employers Dashboard", href: "#" },
+            { name: "Applications", href: "#" },
+        ],
+    },
+    
+];
+
