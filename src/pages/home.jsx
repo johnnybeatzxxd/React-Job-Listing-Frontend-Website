@@ -5,8 +5,27 @@ import { NavigationBar } from '../components/navbar'
 import { SearchInbox } from '../components/search-inbox'
 import { Location } from '../components/location-dropdown'
 import CoverImage from '../assets/Illustration.png'
+import Graphics from '../assets/pen-nib-duotone 1.svg'
+import Coding from '../assets/code-duotone 1.svg'
+import Marketing from '../assets/megaphone-simple-duotone 1.svg'
+import Video from '../assets/monitor-play-duotone 1.svg'
+import Music from '../assets/music-notes-duotone 1.svg'
+import Health from '../assets/first-aid-kit-duotone 1.svg'
+import Finance from '../assets/chart-bar-horizontal-duotone 1.svg'
+import Database from '../assets/database-svgrepo-com.svg'
+
 export function HomePage(){
-    return(
+    const categoriesData = [
+        { title: "Graphics & Design", positions: "357 Open position", icon: <img src={Graphics} alt="Graphics & Design Icon" /> },
+        { title: "Code & Programming", positions: "312 Open position", icon: <img src={Coding} alt="Code & Programming Icon" /> },
+        { title: "Digital Marketing", positions: "297 Open position", icon: <img src={Marketing} alt="Digital Marketing Icon" /> },
+        { title: "Video & Animation", positions: "247 Open position", icon: <img src={Video} alt="Video & Animation Icon" /> },
+        { title: "Music & Audio", positions: "204 Open position", icon: <img src={Music} alt="Music & Audio Icon" /> },
+        { title: "Account & Finance", positions: "167 Open position", icon: <img src={Finance} alt="Account & Finance Icon" /> },
+        { title: "Health & Care", positions: "145 Open position", icon: <img src={Health} alt="Health & Care Icon" /> },
+        { title: "Data & Science", positions: "95 Open position", icon: <img src={Database} alt="Data & Science Icon" style={{ width: '24px', height: '24px' }} /> },
+    ];
+        return(
         <Home>
             <NavigationBar/>
             <HomeHeader>
@@ -36,8 +55,32 @@ export function HomePage(){
                     </Image>
                     
                 </Header>
+                
             </HomeHeader>
-            
+            <HomeBody>
+                <Body>
+                    <Title>
+                    Popular category
+                     </Title>
+                    <Categories>
+                        {categoriesData.map((category, index) => (
+                            <CategoryCard key={index}>
+                                <IconWrapper>
+                                    {category.icon}
+                                </IconWrapper>
+                                <TextContent>
+                                    <CategoryTitle>{category.title}</CategoryTitle>
+                                    <CategoryPositions>{category.positions}</CategoryPositions>
+                                </TextContent>
+                            </CategoryCard>
+                        ))}
+                    </Categories>
+                </Body>
+        
+            </HomeBody>
+            <Footer>
+
+            </Footer>
         </Home>
     )
 }
@@ -126,4 +169,80 @@ const SubTexts = styled.div`
     display: flex;
     flex-direction: row;
 
+`
+
+const HomeBody = styled.div`
+    display: flex;
+    flex-direction: row-reverse;
+    width: 100%;
+    height: 60%;
+`
+const Body = styled.div`
+    display: flex; 
+    flex-direction:column ;
+    justify-self: end;
+    width: 90.5%;
+    height: 100%;
+`
+const Title = styled.h1`
+    font-family: "Inter Tight", sans-serif;
+    font-optical-sizing: auto;
+    font-size: 2.2rem;
+    font-weight: 500 ;
+    font-style: normal;
+`
+const Categories = styled.div`
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 20px;
+    height: 60%;
+    width: 100%;
+`
+
+const CategoryCard = styled.div`
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+`
+
+const IconWrapper = styled.div`
+    background-color: #E7F0FA;
+    padding: 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #0A65CC;
+    min-width: 48px;
+    min-height: 48px;
+`
+
+const TextContent = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+`
+
+const CategoryTitle = styled.h3`
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+`
+
+const CategoryPositions = styled.span`
+    color: #666;
+    font-size: 0.9rem;
 `
