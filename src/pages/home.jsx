@@ -13,6 +13,8 @@ import Music from '../assets/music-notes-duotone 1.svg'
 import Health from '../assets/first-aid-kit-duotone 1.svg'
 import Finance from '../assets/chart-bar-horizontal-duotone 1.svg'
 import Database from '../assets/database-svgrepo-com.svg'
+import LogoImage from '../assets/Logo.svg'
+
 
 export function HomePage(){
     const categoriesData = [
@@ -78,41 +80,14 @@ export function HomePage(){
                 </Body>
         
             </HomeBody>
-            <Footer>
-                <Foot>
-                    <FooterContent>
-                        <FooterSection>
-                            <img src={Finance} alt="Jobpilot" style={{ height: '30px' }} />
-                            <div>Call now: (+251) 977276556 </div>
-                            
-                        </FooterSection>
-                        {footerLinks.map((section, index) => (
-                            <FooterSection key={index}>
-                                <FooterTitle>{section.title}</FooterTitle>
-                                {section.links.map((link, linkIndex) => (
-                                    <FooterLink key={linkIndex} href={link.href}>{link.name}</FooterLink>
-                                ))}
-                            </FooterSection>
-                        ))}
-                         <FooterBottom>
-                        <Copyright>© 2024 Jobpilot - Job Portal. All rights Reserved</Copyright>
-                        <SocialLinks>
-                            <FooterLink href="#"><i className="fab fa-facebook-f"></i></FooterLink>
-                            <FooterLink href="#"><i className="fab fa-youtube"></i></FooterLink>
-                            <FooterLink href="#"><i className="fab fa-instagram"></i></FooterLink>
-                            <FooterLink href="#"><i className="fab fa-twitter"></i></FooterLink>
-                        </SocialLinks>
-                    </FooterBottom>
-                    </FooterContent>
-                   
-                </Foot>
-            </Footer>
+            
         </Home>
     )
 }
 const Home = styled.div`
     height: 100vh;
     width: 100vw;
+    overflow-x: hidden;
 `
 const HomeHeader = styled.div`
     display: flex;
@@ -120,6 +95,11 @@ const HomeHeader = styled.div`
     height: 100%;
     width: 100%;
     background-color:#F1F2F4;
+
+    @media (max-width: 768px) {
+        height: auto;
+        padding: 20px 0;
+    }
 `
 const Header = styled.div`
     display: flex;
@@ -127,6 +107,15 @@ const Header = styled.div`
     width: 90.5%;
     height: 100%;
 
+    @media (max-width: 1024px) {
+        width: 95%;
+    }
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        width: 90%;
+        margin: 0 auto;
+    }
 `
 const Content = styled.div`
     display: flex;
@@ -134,6 +123,13 @@ const Content = styled.div`
     width: 55%;
     height: 90%;
     border:0px solid blue;
+
+    @media (max-width: 768px) {
+        width: 100%;
+        height: auto;
+        text-align: center;
+        align-items: center;
+    }
 `
 const Text = styled.h1`
     display: flex;
@@ -145,6 +141,16 @@ const Text = styled.h1`
     font-weight: 300;
     font-style: normal;
 
+    @media (max-width: 1024px) {
+        font-size: 2.8rem;
+    }
+
+    @media (max-width: 768px) {
+        font-size: 2.2rem;
+        padding-top: 40px;
+        text-align: center;
+        justify-content: center;
+    }
 `
 const SubText = styled.h1`
     display: flex;
@@ -162,13 +168,19 @@ const SearchBox = styled.div`
     flex-direction: row;
     align-items : center;
     width: 90%;
-    height: 70px;
+    height: 65px;
     background-color: white;
     border-radius: 8px;
     border: 1px solid #E4E5E8;
     margin: 0px;
     padding-right: 5px;
     
+    @media (max-width: 768px) {
+        flex-direction: column;
+        height: auto;
+        padding: 10px;
+        gap: 10px;
+    }
 ` 
 const FindButton = styled.button`
     background-color:#0A65CC;
@@ -178,6 +190,13 @@ const FindButton = styled.button`
     margin-left: auto;
     height: 80%;
     justify-self:end;
+    padding: 0 20px;
+
+    @media (max-width: 768px) {
+        width: 100%;
+        margin: 10px 0;
+        height: 40px;
+    }
     
 `
 const Image = styled.div`
@@ -187,14 +206,27 @@ const Image = styled.div`
     justify-content: center;
     align-items: center;
     border: 0px solid yellow;
+
+    @media (max-width: 768px) {
+        height: 300px;
+        margin-top: 20px;
+    }
 `
-const Png = styled.img``
+const Png = styled.img`
+    max-width: 100%;
+    height: auto;
+`
 
 
 const SubTexts = styled.div`
     display: flex;
     flex-direction: row;
 
+    @media (max-width: 768px) {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 5px;
+    }
 `
 
 const HomeBody = styled.div`
@@ -202,6 +234,11 @@ const HomeBody = styled.div`
     flex-direction: row-reverse;
     width: 100%;
     height: 60%;
+
+    @media (max-width: 768px) {
+        height: auto;
+        padding: 20px 0;
+    }
 `
 const Body = styled.div`
     display: flex; 
@@ -209,6 +246,15 @@ const Body = styled.div`
     justify-self: end;
     width: 90.5%;
     height: 100%;
+
+    @media (max-width: 1024px) {
+        width: 95%;
+    }
+
+    @media (max-width: 768px) {
+        width: 90%;
+        margin: 0 auto;
+    }
 `
 const Title = styled.h1`
     font-family: "Inter Tight", sans-serif;
@@ -216,6 +262,11 @@ const Title = styled.h1`
     font-size: 2.2rem;
     font-weight: 500 ;
     font-style: normal;
+
+    @media (max-width: 768px) {
+        font-size: 1.8rem;
+        text-align: center;
+    }
 `
 const Categories = styled.div`
     display: grid;
@@ -224,6 +275,18 @@ const Categories = styled.div`
     gap: 20px;
     height: 60%;
     width: 100%;
+
+    @media (max-width: 1200px) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    @media (max-width: 900px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 600px) {
+        grid-template-columns: 1fr;
+    }
 `
 
 const CategoryCard = styled.div`
@@ -240,6 +303,10 @@ const CategoryCard = styled.div`
 
     &:hover {
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    @media (max-width: 600px) {
+        padding: 15px;
     }
 `
 
@@ -264,7 +331,7 @@ const TextContent = styled.div`
 
 const CategoryTitle = styled.h3`
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 500;
 `
 
@@ -272,91 +339,3 @@ const CategoryPositions = styled.span`
     color: #666;
     font-size: 0.9rem;
 `
-const Footer = styled.div`
-    display: flex;
-    flex-direction: row-reverse;
-    flex: 1;
-    width: 100%;
-    height:40%;
-    background-color: #18191C;
-`
-const Foot = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-self: end;
-    width: 90.5%;
-    height: 100%;
-    color: white;
-    padding: 40px 0;
-`
-
-const FooterContent = styled.div`
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 40px;
-`
-
-const FooterSection = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-`
-
-const FooterTitle = styled.h3`
-    font-size: 1rem;
-    font-weight: 500;
-    margin: 0;
-`
-
-const FooterLink = styled.a`
-    color: #9CA3AF;
-    text-decoration: none;
-    font-size: 0.9rem;
-    &:hover {
-        color: white;
-    }
-`
-
-const FooterBottom = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 20px;
-    background-color: #18191C;
-    border-top: 1px solid #333;
-`
-
-const Copyright = styled.p`
-    color: #9CA3AF;
-    font-size: 0.9rem;
-    margin: 0;
-`
-
-const SocialLinks = styled.div`
-    display: flex;
-    gap: 16px;
-`
-
-const footerLinks = [
-   
-    {
-        title: "Candidate",
-        links: [
-            { name: "Browse Jobs", href: "#" },
-            { name: "Browse Employers", href: "#" },
-            { name: "Candidate Dashboard", href: "#" },
-            { name: "Saved Jobs", href: "#" },
-        ],
-    },
-    {
-        title: "Employers",
-        links: [
-            { name: "Post a Job", href: "#" },
-            { name: "Browse Candidates", href: "#" },
-            { name: "Employers Dashboard", href: "#" },
-            { name: "Applications", href: "#" },
-        ],
-    },
-    
-];
-
