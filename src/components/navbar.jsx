@@ -17,11 +17,13 @@ export function NavigationBar(){
                 <Navbody>
                 <LeftSpace/>
                     <Logo src={LogoImage} alt="Logo" />
-                    <Search>
-                        <CountryDropdown />
-                        <SLogo src={SearchLogo} alt="Logo" />
-                        <SearchInput placeholder='Job tittle, keyword, company'/>
-                    </Search>
+                    <SearchWrapper>
+                        <Search>
+                            <CountryDropdown />
+                            <SLogo src={SearchLogo} alt="Logo" />
+                            <SearchInput placeholder='Job title, keyword, company'/>
+                        </Search>
+                    </SearchWrapper>
                     <Navbuttons>
                         <NavButton style={{backgroundColor:"white",color:"#0A65CC"}}>Sign in</NavButton>
                         <NavButton>Post A Job</NavButton>
@@ -35,8 +37,7 @@ export function NavigationBar(){
 const Navbar = styled.div`
     display: flex;
     flex-direction: column;
-    height: 14%;
-    width: 100vw;
+    width: 100%;
     border-bottom: 1px solid grey;
 `
 const NavTab = styled.button`
@@ -66,38 +67,54 @@ const Tabs  = styled.div`
     height: 25%;
     justify-content: center;
     align-items: center;
-    
     gap: 5%;
 `
 const LeftSpace = styled.div`
     padding-left: 130px;
+
+    @media (max-width: 768px) {
+        padding-left: 10px;
+    }
 `
 
 const Navbody = styled.div`
     display: flex;
     flex-direction: row;
     width: 100%;
-    height: 100%;
-    justify-content: start;
+    justify-content: space-between;
+    align-items: center;
     padding-top: 15px;
     padding-bottom: 10px;
 
-    
+    @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: center;
+    }
+
 `
 const Logo = styled.img`
     display: flex;
     max-width: 100%;
     height: auto;
 `
+const SearchWrapper = styled.div`
+    display: flex;
+    justify-content: center;
+    flex-grow: 1;
+`
 const Search = styled.div`
     display: flex;
     flex-direction: row;
     align-items: center;
-    width: 50%;
-    height: 100%;
+    width: 90%;
+    height: 50px;
     border: 1px solid lightgray;
-    margin-left: 32px;
     border-radius: 5px;
+
+    @media (max-width: 768px) {
+        width: 100%;
+        margin-top: 10px;
+    }
 `
 const Dropdown = styled.select`
     border-radius: 5px;
@@ -118,7 +135,11 @@ const SearchInput = styled.input`
     background-color: transparent;
     border:none;
     outline: none;
-    color: black
+    color: black;
+
+    @media (max-width: 768px) {
+        width: 70%;
+    }
 `
 const Navbuttons = styled.div`
     display: flex;
@@ -126,15 +147,19 @@ const Navbuttons = styled.div`
     margin-left: 0%;
     gap: 10px;
     width: 30%;
-    height: 100%;
     margin-right: 20px;
+
+    @media (max-width: 768px) {
+        justify-content: center;
+        width: 100%;
+        margin-top: 10px;
+    }
 `
 const NavButton = styled.button`
     background-color:#0A65CC;
     border: 1px solid #0A65CC;
     border-radius: 3px;
     color: white;
-    
 `
 const CountryDropdown = () => {
     const countries = [
