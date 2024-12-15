@@ -40,8 +40,8 @@ export function SignupPage() {
        
         <ContentWrapper>
           <FormSection>
-            <ThemeIcon onClick={toggleTheme} src={isDarkMode ? SunIcon : MoonIcon} alt="Theme Toggle" />
             <Logo onClick={()=>{window.location.href = "/"}} src={isDarkMode ? LogoDark :LogoImage} alt="Logo" />
+            <ThemeIcon onClick={toggleTheme} src={isDarkMode ? SunIcon : MoonIcon} alt="Theme Toggle" />
             <Title>Create account.</Title>
             <SubTitle>Already have an account? Login</SubTitle>
             
@@ -88,7 +88,6 @@ export function SignupPage() {
                   onChange={handleChange}
                 />
               </InputGroup>
-
               <CheckboxGroup>
                 <input type="checkbox" id="terms" />
                 <label htmlFor="terms">I agree to the Terms & Conditions</label>
@@ -142,6 +141,7 @@ const FormSection = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 `;
 
 const ImageSection = styled.div`
@@ -295,7 +295,8 @@ const ThemeIcon = styled.img`
     height: 20px;
     cursor: pointer;
     position: absolute;
-    right: 20px;
-    top: 20px; /* Adjusted to position it in the top right corner */
+    right: 40px;
+    top: 20px; 
     font-size: 1.2rem;
+    z-index: 2;
 `
