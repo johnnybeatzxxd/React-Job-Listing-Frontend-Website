@@ -8,6 +8,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital;1,100&display=swap" rel="stylesheet">
     <title>Job-Listing</title>
+    <script>
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      document.documentElement.style.backgroundColor = savedTheme === 'dark' ? '#1f2223' : '#ffffff';
+    </script>
   </head>
   <body>
     <div id="root"></div>

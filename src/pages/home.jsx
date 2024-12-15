@@ -14,9 +14,14 @@ import Health from '../assets/first-aid-kit-duotone 1.svg'
 import Finance from '../assets/chart-bar-horizontal-duotone 1.svg'
 import Database from '../assets/database-svgrepo-com.svg'
 import LogoImage from '../assets/Logo.svg'
-
+import { FooterBar } from '../components/footer.jsx'
+import { ThemeProvider } from 'styled-components';
+import { lightTheme, darkTheme } from '../utils/theme.js';
+import { useContext } from 'react'
+import { Context } from '../App.jsx'
 
 export function HomePage(){
+    const [isDarkMode, setIsDarkMode] = useContext(Context);
     const categoriesData = [
         { title: "Graphics & Design", positions: "357 Open position", icon: <img src={Graphics} alt="Graphics & Design Icon" /> },
         { title: "Code & Programming", positions: "312 Open position", icon: <img src={Coding} alt="Code & Programming Icon" /> },
@@ -28,6 +33,7 @@ export function HomePage(){
         { title: "Data & Science", positions: "95 Open position", icon: <img src={Database} alt="Data & Science Icon" style={{ width: '24px', height: '24px' }} /> },
     ];
         return(
+        <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}> 
         <Home>
             <NavigationBar/>
             <HomeHeader>
@@ -42,11 +48,11 @@ export function HomePage(){
                         </SearchBox>
                         <SubTexts>
                             <SubText style={{fontSize:"0.8rem"}}>Suggestion: </SubText>
-                            <SubText style={{fontSize:"0.8rem",color:"#1d1d1d"}}> {"Designer, "}</SubText>
-                            <SubText style={{fontSize:"0.8rem",color:"#1d1d1d"}}>  Programing,</SubText>
+                            <SubText style={{fontSize:"0.8rem",color:`${({ theme }) => theme.color}`}}> {"Designer, "}</SubText>
+                            <SubText style={{fontSize:"0.8rem",color:`${({ theme }) => theme.color}`}}>  Programing,</SubText>
                             <SubText style={{fontSize:"0.8rem",color:"#0A65CC "}}>  Digital Marketing,</SubText>
-                            <SubText style={{fontSize:"0.8rem",color:"#1d1d1d"}}>  Video,</SubText>
-                            <SubText style={{fontSize:"0.8rem",color:"#1d1d1d"}}>  Animation,</SubText>
+                            <SubText style={{fontSize:"0.8rem",color:`${({ theme }) => theme.color}`}}>  Video,</SubText>
+                            <SubText style={{fontSize:"0.8rem",color:`${({ theme }) => theme.color}`}}>  Animation,</SubText>
                             
                             
                         </SubTexts>
@@ -80,21 +86,22 @@ export function HomePage(){
                 </Body>
         
             </HomeBody>
-            
+            <FooterBar/>
         </Home>
+        </ThemeProvider>
     )
 }
 const Home = styled.div`
     height: 100vh;
     width: 100vw;
-    overflow-x: hidden;
+    //overflow-x: hidden;
 `
 const HomeHeader = styled.div`
     display: flex;
     flex-direction: row-reverse;
     height: 100%;
     width: 100%;
-    background-color:#F1F2F4;
+    background-color:${({ theme }) => theme.secBackground};
 
     @media (max-width: 768px) {
         height: auto;
@@ -104,7 +111,7 @@ const HomeHeader = styled.div`
 const Header = styled.div`
     display: flex;
     justify-self: end;
-    width: 90.5%;
+    width: 90.3%;
     height: 100%;
 
     @media (max-width: 1024px) {
@@ -135,6 +142,7 @@ const Text = styled.h1`
     display: flex;
     padding-top: 90px;
     margin:0px;
+    color: ${({ theme }) => theme.color} ;
     font-family: "Inter Tight", sans-serif;
     font-optical-sizing: auto;
     font-size: 3.5rem;
@@ -161,7 +169,7 @@ const SubText = styled.h1`
     font-size: 1.0rem;
     font-weight: 100;
     font-style: normal;
-    color: #5E6670;
+    color: ${({ theme }) => theme.secColor};
 `
 const SearchBox = styled.div`
     display: flex;
@@ -169,9 +177,9 @@ const SearchBox = styled.div`
     align-items : center;
     width: 90%;
     height: 65px;
-    background-color: white;
+    background-color: ${({ theme }) => theme.background};
     border-radius: 8px;
-    border: 1px solid #E4E5E8;
+    border: 1px solid ${({ theme }) => theme.weakBorderColor};
     margin: 0px;
     padding-right: 5px;
     
@@ -207,7 +215,7 @@ const Image = styled.div`
     align-items: center;
     border: 0px solid yellow;
 
-    @media (max-width: 768px) {
+    @media (max-width: 810px) {
         height: 300px;
         margin-top: 20px;
     }
@@ -221,6 +229,7 @@ const Png = styled.img`
 const SubTexts = styled.div`
     display: flex;
     flex-direction: row;
+    color: ${({ theme }) => theme.secColor};
 
     @media (max-width: 768px) {
         flex-wrap: wrap;
@@ -234,6 +243,7 @@ const HomeBody = styled.div`
     flex-direction: row-reverse;
     width: 100%;
     height: 60%;
+    background-color:  ${({ theme }) => theme.background};
 
     @media (max-width: 768px) {
         height: auto;
@@ -246,7 +256,7 @@ const Body = styled.div`
     justify-self: end;
     width: 90.5%;
     height: 100%;
-
+    background-color:  ${({ theme }) => theme.background};
     @media (max-width: 1024px) {
         width: 95%;
     }
@@ -262,7 +272,7 @@ const Title = styled.h1`
     font-size: 2.2rem;
     font-weight: 500 ;
     font-style: normal;
-
+    color:${({ theme }) => theme.color};
     @media (max-width: 768px) {
         font-size: 1.8rem;
         text-align: center;
@@ -272,9 +282,12 @@ const Categories = styled.div`
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    gap: 20px;
-    height: 60%;
-    width: 100%;
+    gap: 15px;
+    height: auto;
+    width: 95%;
+    margin-bottom: 20px;
+    margin-right: 20px;
+    background-color:  ${({ theme }) => theme.background};
 
     @media (max-width: 1200px) {
         grid-template-columns: repeat(3, 1fr);
@@ -290,14 +303,14 @@ const Categories = styled.div`
 `
 
 const CategoryCard = styled.div`
-    background: white;
+    background: ${({ theme }) => theme.background};
     border-radius: 8px;
-    padding: 20px;
+    padding: 15px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
     cursor: pointer;
     transition: all 0.2s ease;
 
@@ -306,21 +319,21 @@ const CategoryCard = styled.div`
     }
 
     @media (max-width: 600px) {
-        padding: 15px;
+        padding: 12px;
     }
 `
 
 const IconWrapper = styled.div`
-    background-color: #E7F0FA;
+    background-color: ${({theme})=>theme.iconWrapper};
     padding: 12px;
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     color: #0A65CC;
-    min-width: 48px;
-    min-height: 48px;
+    min-width: 40px;
+    min-height: 40px;
 `
 
 const TextContent = styled.div`
@@ -331,11 +344,12 @@ const TextContent = styled.div`
 
 const CategoryTitle = styled.h3`
     margin: 0;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 500;
+    color: ${({ theme }) => theme.color};
 `
 
 const CategoryPositions = styled.span`
     color: #666;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 `
