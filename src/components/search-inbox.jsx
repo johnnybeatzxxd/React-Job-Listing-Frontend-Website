@@ -1,15 +1,22 @@
 import { useState } from 'react'
 import { styled } from 'styled-components'
 import '../index.css'
+import { ThemeProvider } from 'styled-components';
+import { lightTheme, darkTheme } from '../utils/theme.js';
+import { useContext } from 'react'
+import { Context } from '../App.jsx'
 
 import SearchLogo from '../assets/fi_search.svg'
 
 export function SearchInbox(){
+    const [isDarkMode, setIsDarkMode] = useContext(Context);
     return (
+        <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}> 
         <Search>
             <SLogo src={SearchLogo} alt="Logo" />
             <SearchInput placeholder='Job tittle, keyword, company'/>
         </Search>
+        </ThemeProvider>
     )   
 }
 
@@ -19,7 +26,7 @@ const Search = styled.div`
     align-items: center;
     width: 50%;
     height: 100%;
-    border: 0px solid lightgray;
+    color:${({ theme }) => theme.color};
     margin-left: 12px;
     border-radius: 5px;
 `
@@ -28,7 +35,7 @@ const Dropdown = styled.select`
     outline: none;
     border: none;
     border-right: 0.5px solid lightgrey;
-    background-color: white;
+    background-color: ${({ theme }) => theme.background};
     color:black
 `
 const SLogo = styled.img`
@@ -42,5 +49,5 @@ const SearchInput = styled.input`
     background-color: transparent;
     border:none;
     outline: none;
-    color: black
+    color: ${({ theme }) => theme.color}
 `

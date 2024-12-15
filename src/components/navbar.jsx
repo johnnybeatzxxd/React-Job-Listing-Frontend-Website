@@ -2,21 +2,33 @@ import { useState } from 'react'
 import { styled } from 'styled-components'
 import '../index.css'
 import LogoImage from '../assets/Logo.svg'
+import LogoDark from '../assets/Logo-dark.svg'
 import SearchLogo from '../assets/fi_search.svg'
+import MoonIcon from '../assets/moon.svg'
+import { ThemeProvider } from 'styled-components';
+import { lightTheme, darkTheme } from '../utils/theme.js';
+import { useContext } from 'react'
+import { Context } from '../App.jsx'
 
 
 export function NavigationBar(){
-    return (
+    const [isDarkMode, setIsDarkMode] = useContext(Context);
+    const toggleTheme = () => {
+        setIsDarkMode((prevMode) => !prevMode);
+      };
+    return (   
+        <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>     
         <Navbar>
                 <Tabs>
-                    <NavTab>Home</NavTab>
-                    <NavTab>Find Jobs</NavTab>
+                    <NavTab onClick={()=>{window.location.href = "/"}}>Home</NavTab>
+                    <NavTab onClick={()=>{window.location.href = "find-jobs"}}>Find Jobs</NavTab>
                     <NavTab>Employers</NavTab>
-                    <NavTab>Candidates</NavTab>
+                    <NavTab onClick={()=>{window.location.href = "dashboard"}}>Dashboard</NavTab>
+                    <ThemeIcon onClick={toggleTheme} src={MoonIcon} alt="Theme Toggle" />
                 </Tabs>
                 <Navbody>
                 <LeftSpace/>
-                    <Logo src={LogoImage} alt="Logo" />
+                    <Logo src={isDarkMode ? LogoDark :LogoImage} alt="Logo" />
                     <SearchWrapper>
                         <Search>
                             <CountryDropdown />
@@ -25,12 +37,13 @@ export function NavigationBar(){
                         </Search>
                     </SearchWrapper>
                     <Navbuttons>
-                        <NavButton style={{backgroundColor:"white",color:"#0A65CC"}}>Sign in</NavButton>
-                        <NavButton>Post A Job</NavButton>
+                        <NavButton>Sign in</NavButton>
+                        <NavButton style={{background:"#0A65CC",color:"white"}}>Post A Job</NavButton>
 
                     </Navbuttons>
                 </Navbody>
             </Navbar>
+            </ThemeProvider>
     )
 }
 
@@ -47,7 +60,7 @@ const NavTab = styled.button`
     width: auto;
     height: 100%;
     background-color: transparent;
-    color: #3d3d3d;
+    color: ${({ theme }) => theme.secColor};
     outline: none;
     border-radius: 0px;
     font-family: "Inter Tight", sans-serif;
@@ -55,19 +68,21 @@ const NavTab = styled.button`
     font-size: 0.8rem;
     font-weight: 100;
     font-style: normal;
+    border-bottom: 2px solid transparent;
     &:hover {
-        border-bottom: 3px solid #0A65CC;
+        border-bottom: 2px solid #0A65CC;
     }
 `
 const Tabs  = styled.div`
     display: flex;
     flex-direction: row;
-    background-color: #F1F2F4;
+    background-color: ${({ theme }) => theme.secBackground};
     width: 100%;
     height: 25%;
     justify-content: center;
     align-items: center;
     gap: 5%;
+    position: relative;
 `
 const LeftSpace = styled.div`
     padding-left: 130px;
@@ -85,6 +100,7 @@ const Navbody = styled.div`
     align-items: center;
     padding-top: 15px;
     padding-bottom: 10px;
+    background-color: ${({ theme }) => theme.background};
 
     @media (max-width: 768px) {
         flex-direction: column;
@@ -106,9 +122,10 @@ const Search = styled.div`
     display: flex;
     flex-direction: row;
     align-items: center;
-    width: 90%;
-    height: 50px;
-    border: 1px solid lightgray;
+    margin-left: 10px;
+    width: 100%;
+    height: 40px;
+    border: 1px solid ${({ theme }) => theme.weakBorderColor};
     border-radius: 5px;
 
     @media (max-width: 768px) {
@@ -121,8 +138,8 @@ const Dropdown = styled.select`
     outline: none;
     border: none;
     border-right: 0.5px solid lightgrey;
-    background-color: white;
-    color:black
+    background-color: ${({ theme }) => theme.background};
+    color: ${({ theme }) => theme.color}
 `
 const SLogo = styled.img`
     margin-left: 15px;
@@ -135,7 +152,7 @@ const SearchInput = styled.input`
     background-color: transparent;
     border:none;
     outline: none;
-    color: black;
+    color: ${({ theme }) => theme.color};
 
     @media (max-width: 768px) {
         width: 70%;
@@ -156,17 +173,16 @@ const Navbuttons = styled.div`
     }
 `
 const NavButton = styled.button`
-    background-color:#0A65CC;
+    background-color: ${({ theme }) => theme.background};
     border: 1px solid #0A65CC;
     border-radius: 3px;
-    color: white;
+    color:${({ theme }) => theme.color} ;
 `
 const CountryDropdown = () => {
     const countries = [
         { name: 'United States', code: 'US', flag: '🇺🇸' },
         { name: 'Canada', code: 'CA', flag: '🇨🇦' },
         { name: 'United Kingdom', code: 'GB', flag: '🇬🇧' },
-        // Add more countries as needed
     ];
 
     const [selectedCountry, setSelectedCountry] = useState(countries[0]);
@@ -181,3 +197,16 @@ const CountryDropdown = () => {
         </Dropdown>
     );
 };
+
+const ThemeIcon = styled.img`
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 1.2rem;
+`
+
