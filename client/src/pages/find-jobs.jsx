@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { styled } from 'styled-components'
 import '../index.css'
-import { NavigationBar } from '../components/navbar'
-import { SearchInbox } from '../components/search-inbox'
-import { Location } from '../components/location-dropdown'
+import { NavigationBar } from '../components/navbar.jsx'
+import { SearchInbox } from '../components/search-inbox.jsx'
+import { Location } from '../components/location-dropdown.jsx'
 import { FooterBar } from '../components/footer.jsx'
 import { ThemeProvider } from 'styled-components';
 import { lightTheme, darkTheme } from '../utils/theme.js';
@@ -282,7 +282,7 @@ const PostedTime = styled.span`
 
 const JobTitle = styled.h3`
     font-size: 1.1rem;
-    color: #0A65CC;
+    color: #147df5;
     margin: 0;
 `
 

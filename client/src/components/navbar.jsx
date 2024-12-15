@@ -5,6 +5,7 @@ import LogoImage from '../assets/Logo.svg'
 import LogoDark from '../assets/Logo-dark.svg'
 import SearchLogo from '../assets/fi_search.svg'
 import MoonIcon from '../assets/moon.svg'
+import SunIcon from '../assets/sun.svg'
 import { ThemeProvider } from 'styled-components';
 import { lightTheme, darkTheme } from '../utils/theme.js';
 import { useContext } from 'react'
@@ -24,11 +25,11 @@ export function NavigationBar(){
                     <NavTab onClick={()=>{window.location.href = "find-jobs"}}>Find Jobs</NavTab>
                     <NavTab>Employers</NavTab>
                     <NavTab onClick={()=>{window.location.href = "dashboard"}}>Dashboard</NavTab>
-                    <ThemeIcon onClick={toggleTheme} src={MoonIcon} alt="Theme Toggle" />
+                    <ThemeIcon onClick={toggleTheme} src={isDarkMode ? SunIcon : MoonIcon} alt="Theme Toggle" />
                 </Tabs>
                 <Navbody>
                 <LeftSpace/>
-                    <Logo src={isDarkMode ? LogoDark :LogoImage} alt="Logo" />
+                    <Logo onClick={()=>{window.location.href = "/"}} src={isDarkMode ? LogoDark :LogoImage} alt="Logo" />
                     <SearchWrapper>
                         <Search>
                             <CountryDropdown />
@@ -37,7 +38,7 @@ export function NavigationBar(){
                         </Search>
                     </SearchWrapper>
                     <Navbuttons>
-                        <NavButton>Sign in</NavButton>
+                        <NavButton onClick={()=>{window.location.href = "signin"}}>Sign in</NavButton>
                         <NavButton style={{background:"#0A65CC",color:"white"}}>Post A Job</NavButton>
 
                     </Navbuttons>
@@ -112,6 +113,7 @@ const Logo = styled.img`
     display: flex;
     max-width: 100%;
     height: auto;
+    cursor: pointer;
 `
 const SearchWrapper = styled.div`
     display: flex;

@@ -3,7 +3,9 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import { HomePage } from './pages/home';
 import { FindJobs } from './pages/find-jobs';
 import { JobDetails } from './pages/job-details';
-import { DashboardPage } from './pages/dashboard'
+import { DashboardPage } from './pages/dashboard';
+import { SignupPage } from './pages/signup';
+import { SigninPage } from './pages/signin';
 import './index.css'
 import { createContext, useEffect } from 'react';
 export const Context = createContext()
@@ -27,6 +29,8 @@ function App() {
           <Route path="find-jobs" element={<FindJobs />} />
           <Route path="details" element={<JobDetails />} />
           <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="signup" element={<SignupPage />} />
+          <Route path="signin" element={<SigninPage />} />
         </Routes>
       </BrowserRouter>
     </Context.Provider>
