@@ -1,58 +1,61 @@
-import { styled } from 'styled-components'
-import { ThemeProvider } from 'styled-components';
-import { lightTheme, darkTheme } from '../utils/theme.js';
+import { styled, ThemeProvider } from 'styled-components'
 import { useContext } from 'react'
 import { Context } from '../App.jsx'
+import { lightTheme, darkTheme } from '../utils/theme.js'
 
 export function ApplicationModal({ isOpen, onClose }) {
-    if (!isOpen) return null;
-    const [isDarkMode, setIsDarkMode] = useContext(Context);
+    const [isDarkMode] = useContext(Context)
+
+    if (!isOpen) return null
+
     return (
-        <ModalOverlay>
-            <ModalContent>
-                <ModalHeader>
-                    <h3>Apply Job: Senior UX Designer</h3>
-                    <CloseButton onClick={onClose}>×</CloseButton>
-                </ModalHeader>
+        <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
+            <ModalOverlay>
+                <ModalContent>
+                    <ModalHeader>
+                        <h3>Apply Job: Senior UX Designer</h3>
+                        <CloseButton onClick={onClose}>×</CloseButton>
+                    </ModalHeader>
 
-                <ModalBody>
-                    <FormGroup>
-                        <Label>Choose Resume</Label>
-                        <Select>
-                            <option value="">Select...</option>
-                        </Select>
-                    </FormGroup>
+                    <ModalBody>
+                        <FormGroup>
+                            <Label>Choose Resume</Label>
+                            <Select>
+                                <option value="">Select...</option>
+                            </Select>
+                        </FormGroup>
 
-                    <FormGroup>
-                        <Label>Cover Letter</Label>
-                        <TextEditor>
-                            <EditorToolbar>
-                                <ToolbarButton>B</ToolbarButton>
-                                <ToolbarButton>I</ToolbarButton>
-                                <ToolbarButton>U</ToolbarButton>
-                                <ToolbarButton>S</ToolbarButton>
-                                <ToolbarButton>🔗</ToolbarButton>
-                                <ToolbarButton>≡</ToolbarButton>
-                                <ToolbarButton>⋮</ToolbarButton>
-                            </EditorToolbar>
-                            <TextArea 
-                                placeholder="Write down your biography here. Let the employers know who you are..."
-                            />
-                        </TextEditor>
-                    </FormGroup>
+                        <FormGroup>
+                            <Label>Cover Letter</Label>
+                            <TextEditor>
+                                <EditorToolbar>
+                                    <ToolbarButton>B</ToolbarButton>
+                                    <ToolbarButton>I</ToolbarButton>
+                                    <ToolbarButton>U</ToolbarButton>
+                                    <ToolbarButton>S</ToolbarButton>
+                                    <ToolbarButton>🔗</ToolbarButton>
+                                    <ToolbarButton>≡</ToolbarButton>
+                                    <ToolbarButton>⋮</ToolbarButton>
+                                </EditorToolbar>
+                                <TextArea 
+                                    placeholder="Write down your biography here. Let the employers know who you are..."
+                                />
+                            </TextEditor>
+                        </FormGroup>
 
-                    <ButtonGroup>
-                        <CancelButton onClick={onClose}>Cancel</CancelButton>
-                        <ApplyButton>
-                            Apply Now
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <path d="M4.167 10h11.666M10 4.167L15.833 10 10 15.833" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                        </ApplyButton>
-                    </ButtonGroup>
-                </ModalBody>
-            </ModalContent>
-        </ModalOverlay>
+                        <ButtonGroup>
+                            <CancelButton onClick={onClose}>Cancel</CancelButton>
+                            <ApplyButton>
+                                Apply Now
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M4.167 10h11.666M10 4.167L15.833 10 10 15.833" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </ApplyButton>
+                        </ButtonGroup>
+                    </ModalBody>
+                </ModalContent>
+            </ModalOverlay>
+        </ThemeProvider>
     )
 }
 
@@ -70,7 +73,7 @@ const ModalOverlay = styled.div`
 `
 
 const ModalContent = styled.div`
-    background: white;
+    background: ${({theme})=>theme.background};
     border-radius: 8px;
     width: 500px;
     max-width: 90%;
@@ -81,12 +84,13 @@ const ModalHeader = styled.div`
     justify-content: space-between;
     align-items: center;
     padding: 16px 24px;
-    border-bottom: 1px solid #E4E5E8;
+    border-bottom: 1px solid ${({theme})=>theme.weakBorderColor};
 
     h3 {
         margin: 0;
         font-size: 18px;
         font-weight: 500;
+        color: ${({theme})=>theme.color};
     }
 `
 
@@ -95,11 +99,12 @@ const CloseButton = styled.button`
     border: none;
     font-size: 24px;
     cursor: pointer;
-    color: #7C8493;
+    color: ${({theme})=>theme.color};
 `
 
 const ModalBody = styled.div`
     padding: 24px;
+    color: ${({theme})=>theme.color};
 `
 
 const FormGroup = styled.div`
@@ -115,16 +120,16 @@ const Label = styled.label`
 const Select = styled.select`
     width: 100%;
     padding: 8px;
-    background-color: #ffffff;
-    color: #18191c;
-    border: 1px solid #E4E5E8;
+    background-color: ${({theme})=>theme.background};
+    color: ${({theme})=>theme.color};
+    border: 1px solid ${({theme})=>theme.weakBorderColor};
     border-radius: 4px;
 `
 
 const TextEditor = styled.div`
     display: flex;
     flex-direction: column;
-    border: 1px solid #E4E5E8;
+    border: 1px solid ${({theme})=>theme.weakBorderColor};
     border-radius: 4px;
 `
 
@@ -132,7 +137,7 @@ const EditorToolbar = styled.div`
     display: flex;
     gap: 8px;
     padding: 8px;
-    border-bottom: 1px solid #E4E5E8;
+    border-bottom: 1px solid ${({theme})=>theme.weakBorderColor};
 `
 
 const ToolbarButton = styled.button`
@@ -140,20 +145,20 @@ const ToolbarButton = styled.button`
     border: none;
     padding: 4px 8px;
     cursor: pointer;
-    color: #18191c;
+    color: ${({theme})=>theme.secColor};
     &:hover {
-        background: #F1F2F4;
+        background: ${({theme})=>theme.secBackground};
         border-radius: 4px;
     }
 `
 
 const TextArea = styled.textarea`
-    background-color: white;
+    background-color: ${({theme})=>theme.background};
     min-height: 150px;
     padding: 12px;
     border: none;
     resize: vertical;
-    color:#18191c;
+    color:${({theme})=>theme.color};
     &:focus {
         outline: none;
     }
@@ -168,14 +173,14 @@ const ButtonGroup = styled.div`
 
 const CancelButton = styled.button`
     padding: 8px 16px;
-    border: 1px solid #E4E5E8;
-    color: #18191c;
+    border: 1px solid ${({theme})=>theme.weakBorderColor};
+    color: ${({theme})=>theme.color};
     border-radius: 6px;
-    background: white;
+    background: ${({theme})=>theme.background};
     cursor: pointer;
     
     &:hover {
-        background: #F1F2F4;
+        background: ${({theme})=>theme.secBackground};
     }
 `
 

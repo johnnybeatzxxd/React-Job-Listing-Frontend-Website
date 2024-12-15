@@ -51,7 +51,7 @@ const Navbar = styled.div`
     display: flex;
     flex-direction: column;
     width: 100%;
-    border-bottom: 1px solid grey;
+    border-bottom: 1px solid ${({theme})=>theme.weakBorderColor};
 `
 const NavTab = styled.button`
     display: flex;
@@ -134,10 +134,11 @@ const Search = styled.div`
     }
 `
 const Dropdown = styled.select`
+    // make the text on the center
+    text-align: center;
     border-radius: 5px;
     outline: none;
     border: none;
-    border-right: 0.5px solid lightgrey;
     background-color: ${({ theme }) => theme.background};
     color: ${({ theme }) => theme.color}
 `
