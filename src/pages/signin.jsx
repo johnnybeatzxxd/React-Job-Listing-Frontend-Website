@@ -7,29 +7,83 @@ import MoonIcon from '../assets/moon.svg'
 import SunIcon from '../assets/sun.svg'
 import LogoImage from '../assets/Logo.svg'
 import LogoDark from '../assets/Logo-dark.svg'
+import { signin } from '../utils/auth-requests.js'
+import { toast } from 'react-hot-toast';
 
 export function SigninPage() {
   const [isDarkMode,setIsDarkMode] = useContext(Context);
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState('Candidate');
   const [formData, setFormData] = useState({
-    fullName: '',
-    username: '',
     email: '',
     password: '',
-    confirmPassword: ''
   });
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    setFormData(prevData => ({
+      ...prevData,
+      [name]: value
+    }));
+    validateField(name, value);
+  };
+
+  const validateField = (name, value) => {
+    const fieldErrors = { ...errors };
+  
+    switch (name) {
+      case 'email':
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        fieldErrors.email = value ? (emailRegex.test(value) ? '' : 'Invalid email address') : 'Email is required';
+        break;
+  
+      case 'password':
+        fieldErrors.password = value ? '' : 'Password is required';
+        break;
+  
+      default:
+        break;
+    }
+  
+    setErrors(fieldErrors);
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+   
+    if (!formData.email) newErrors.email = 'Email is required';
+    if (!formData.password) newErrors.password = 'Password is required';
+    
+  
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (formData.email && !emailRegex.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+    
+    return newErrors;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const validationErrors = validateForm();
+    
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+    
+    signin(formData).then((result) => {
+      if (result.success) {
+        toast.success('Successfully signed in!');
   
+      } else {
+        toast.error(result.message || 'Sign in failed');
+      }
+    }).catch((error) => {
+      toast.error('An error occurred during sign in');
+    });
   };
 
   const toggleTheme = () => {
@@ -51,25 +105,31 @@ export function SigninPage() {
 
             <Form onSubmit={handleSubmit}>
               <InputGroup>
-                <Input
-                  type="text"
-                  placeholder="Email address"
-                  name="email"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                />
-                <Input
-                  type="text"
-                  placeholder="Password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                />
+                <InputWithError>
+                  <Input
+                    type="email"
+                    placeholder="Email address"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
+                  {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
+                </InputWithError>
+                <InputWithError>
+                  <Input
+                    type="password"
+                    placeholder="Password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                  />
+                  {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
+                </InputWithError>
                 
               </InputGroup>
 
               <CheckboxGroup>
-                <input type="checkbox" id="terms" />
+                <input type="checkbox" id="terms" defaultChecked />
                 <label htmlFor="terms">Remember me</label>  
                 <label style={{marginLeft: 'auto',color: '#0A65CC',fontSize: '12px'}} htmlFor="terms">Forgot password?</label>
               </CheckboxGroup>
@@ -187,16 +247,6 @@ const ButtonGroup = styled.div`
   gap: 12px;
   margin-bottom: 24px;
 `;
-
-const RoleButton = styled.button`
-  padding: 8px 24px;
-  border: 1px solid ${({theme}) => theme.weakBorderColor};
-  background:  ${props => props.active ? '#0A65CC' : 'transparent'};
-  color: ${props => props.active ? 'white' : ({theme}) => theme.color};
-  border-radius: 4px;
-  cursor: pointer;
-`;
-
 const Form = styled.form`
   width: 100%;
   max-width: 400px;
@@ -281,3 +331,14 @@ const ThemeIcon = styled.img`
     top: 20px; 
     font-size: 1.2rem;
 `
+const InputWithError = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`;
+const ErrorMessage = styled.span`
+  color: #ff0000;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+`;

@@ -8,6 +8,7 @@ import { SignupPage } from './pages/signup';
 import { SigninPage } from './pages/signin';
 import './index.css'
 import { createContext, useEffect } from 'react';
+import { Toaster } from 'react-hot-toast';
 export const Context = createContext()
 function App() {
 
@@ -22,18 +23,21 @@ function App() {
 
 
   return (
-    <Context.Provider value={[isDarkMode,setIsDarkMode]}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<HomePage />} /> 
-          <Route path="find-jobs" element={<FindJobs />} />
-          <Route path="details" element={<JobDetails />} />
-          <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="signup" element={<SignupPage />} />
-          <Route path="signin" element={<SigninPage />} />
-        </Routes>
-      </BrowserRouter>
-    </Context.Provider>
+    <>
+      <Toaster position="top-right" />
+      <Context.Provider value={[isDarkMode,setIsDarkMode]}>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<HomePage />} /> 
+            <Route path="find-jobs" element={<FindJobs />} />
+            <Route path="details" element={<JobDetails />} />
+            <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="signup" element={<SignupPage />} />
+            <Route path="signin" element={<SigninPage />} />
+          </Routes>
+        </BrowserRouter>
+      </Context.Provider>
+    </>
   )
 }
 

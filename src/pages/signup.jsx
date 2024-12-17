@@ -1,39 +1,152 @@
-import { useState, useContext } from 'react'
+import { useState, useContext, useEffect } from 'react'
 import { styled, ThemeProvider } from 'styled-components'
 import { lightTheme, darkTheme } from '../utils/theme.js'
 import { Context } from '../App.jsx'
-import { NavigationBar } from '../components/navbar.jsx'
+import { toast } from 'react-hot-toast';
+
 import MoonIcon from '../assets/moon.svg'
 import SunIcon from '../assets/sun.svg'
 import LogoImage from '../assets/Logo.svg'
 import LogoDark from '../assets/Logo-dark.svg'
+
+import { signup } from '../utils/auth-requests.js'
 
 export function SignupPage() {
   const [isDarkMode,setIsDarkMode] = useContext(Context);
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState('Candidate');
   const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
     fullName: '',
-    username: '',
+    companyName: '',
+    role: role,
     email: '',
     password: '',
     confirmPassword: ''
   });
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
+    const { name, value } = e.target;
+  
+    setFormData(prevData => {
+      const newData = { ...prevData, [name]: value };
+  
+      if (name === 'firstName' || name === 'lastName') {
+        const firstName = name === 'firstName' ? value : prevData.firstName;
+        const lastName = name === 'lastName' ? value : prevData.lastName;
+        newData.fullName = `${firstName} ${lastName}`.trim();
+      }
+  
+      return newData;
     });
+  
+    validateField(name, value);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-  
+    const validationErrors = validateForm();
+    
+    console.log('Validation Errors:', validationErrors);
+    
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      console.log('Setting errors:', validationErrors);
+      return;
+    }
+    
+    console.log('form submitted successfully!');
+    signup(formData).then((result) => {
+        if (!result.success) {
+            const errorMessage = typeof result.message === 'string' ? result.message : JSON.stringify(result.message);
+            toast.error(errorMessage);
+        } else {
+            const successMessage = typeof result.message === 'string' ? result.message : JSON.stringify(result.message);
+            toast.success(successMessage);
+        }
+    });
   };
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
   };
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+   
+    if (!formData.email) newErrors.email = 'Email is required';
+    if (!formData.password) newErrors.password = 'Password is required';
+    if (!formData.confirmPassword) newErrors.confirmPassword = 'Please confirm your password';
+    
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (formData.email && !emailRegex.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+    
+
+    if (formData.password && formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters long';
+    }
+    
+  
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+    
+
+    if (role === 'Candidate') {
+      if (!formData.firstName) newErrors.firstName = 'First name is required';
+      if (!formData.lastName) newErrors.lastName = 'Last name is required';
+    } else {
+      if (!formData.companyName) newErrors.companyName = 'Company name is required';
+      if (!formData.fullName) newErrors.fullName = 'Full name is required';
+    }
+
+    return newErrors;
+  };
+  const validateField = (name, value) => {
+    const fieldErrors = { ...errors };
+  
+    switch (name) {
+      case 'email':
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        fieldErrors.email = value ? (emailRegex.test(value) ? '' : 'Invalid email address') : 'Email is required';
+        break;
+  
+      case 'password':
+        fieldErrors.password = value.length >= 6 ? '' : 'Password must be at least 6 characters';
+        break;
+  
+      case 'confirmPassword':
+        fieldErrors.confirmPassword = value === formData.password ? '' : 'Passwords do not match';
+        break;
+  
+      case 'firstName':
+        fieldErrors.firstName = value ? '' : 'First name is required';
+        break;
+  
+      case 'lastName':
+        fieldErrors.lastName = value ? '' : 'Last name is required';
+        break;
+  
+      case 'companyName':
+        fieldErrors.companyName = value ? '' : 'Company name is required';
+        break;
+  
+      case 'fullName':
+        fieldErrors.fullName = value ? '' : 'Full name is required';
+        break;
+  
+      default:
+        break;
+    }
+  
+    setErrors(fieldErrors);
+  };
+
   return (
     <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
       <SignupContainer>
@@ -43,7 +156,7 @@ export function SignupPage() {
             <Logo onClick={()=>{window.location.href = "/"}} src={isDarkMode ? LogoDark :LogoImage} alt="Logo" />
             <ThemeIcon onClick={toggleTheme} src={isDarkMode ? SunIcon : MoonIcon} alt="Theme Toggle" />
             <Title>Create account.</Title>
-            <SubTitle>Already have an account? Login</SubTitle>
+            <SubTitle>Already have an account? <a onClick={()=>{window.location.href = '/signin'} }>Login</a></SubTitle>
             
             <ButtonGroup>
               <RoleButton style={role === 'Candidate' ? { backgroundColor: '#0A65CC', color: 'white' } : {backgroundColor: 'transparent', color: '#0A65CC'}} onClick={() => setRole('Candidate')} active>Candidate</RoleButton>
@@ -52,41 +165,88 @@ export function SignupPage() {
 
             <Form onSubmit={handleSubmit}>
               <InputGroup>
-                <Input
-                  type="text"
-                  placeholder={role === 'Candidate' ? "First Name" : "Company Name"}
-                  name={role === 'Candidate' ? "firstName" : "companyName"}
-                  value={formData.firstName}
-                  onChange={handleChange}
-                />
-                <Input
-                  type="text"
-                  placeholder={role === 'Candidate' ? "Last Name" : "Full Name"}
-                  name={role === 'Candidate' ? "lastName" : "fullName"}
-                  value={formData.lastName}
-                  onChange={handleChange}
-                />
-                <Input
-                  type="email"
-                  placeholder="Email address"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                />
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                />
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Confirm Password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                />
+              {role === 'Candidate' ? (
+                  <>
+                
+                    <InputWithError>
+                      <Input
+                        type="text"
+                        placeholder="First Name"
+                        name="firstName"
+                        value={formData.firstName}
+                        onChange={handleChange}
+                      />
+                      {errors.firstName && <ErrorMessage>{errors.firstName}</ErrorMessage>}
+                    </InputWithError>
+
+                    <InputWithError>
+                      <Input
+                        type="text"
+                        placeholder="Last Name"
+                        name="lastName"
+                        value={formData.lastName}
+                        onChange={handleChange}
+                      />
+                      {errors.lastName && <ErrorMessage>{errors.lastName}</ErrorMessage>}
+                    </InputWithError>
+                  </>
+                ) : (
+                  <>
+                    <InputWithError>
+                      <Input
+                        type="text"
+                        placeholder="Company Name"
+                        name="companyName"
+                        value={formData.companyName}
+                        onChange={handleChange}
+                      />
+                      {errors.companyName && <ErrorMessage>{errors.companyName}</ErrorMessage>}
+                    </InputWithError>
+
+                    <InputWithError>
+                      <Input
+                        type="text"
+                        placeholder="Full Name"
+                        name="fullName"
+                        value={formData.fullName}
+                        onChange={handleChange}
+                      />
+                      {errors.fullName && <ErrorMessage>{errors.fullName}</ErrorMessage>}
+                    </InputWithError>
+                  </>
+                )}
+                <InputWithError>
+                  <Input
+                    type="email"
+                    placeholder="Email address"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
+                  {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
+                </InputWithError>
+                
+                <InputWithError>
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                  />
+                  {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
+                </InputWithError>
+                
+                <InputWithError>
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Confirm Password"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                  />
+                  {errors.confirmPassword && <ErrorMessage>{errors.confirmPassword}</ErrorMessage>}
+                </InputWithError>
               </InputGroup>
               <CheckboxGroup>
                 <input type="checkbox" id="terms" />
@@ -300,3 +460,16 @@ const ThemeIcon = styled.img`
     font-size: 1.2rem;
     z-index: 2;
 `
+
+const InputWithError = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`;
+
+const ErrorMessage = styled.span`
+  color: #ff0000;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+`;
