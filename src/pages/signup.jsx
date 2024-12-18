@@ -65,6 +65,7 @@ export function SignupPage() {
         } else {
             const successMessage = typeof result.message === 'string' ? result.message : JSON.stringify(result.message);
             toast.success(successMessage);
+            window.location.href = '/set-profile?fullName=' + formData.fullName;
         }
     });
   };

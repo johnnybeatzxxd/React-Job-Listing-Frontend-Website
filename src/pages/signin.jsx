@@ -77,6 +77,7 @@ export function SigninPage() {
     signin(formData).then((result) => {
       if (result.success) {
         toast.success('Successfully signed in!');
+        window.location.href = '/';
   
       } else {
         toast.error(result.message || 'Sign in failed');

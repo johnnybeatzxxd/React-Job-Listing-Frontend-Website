@@ -13,10 +13,11 @@ import { Context } from '../App.jsx'
 
 
 export function NavigationBar(){
-    const [isDarkMode, setIsDarkMode] = useContext(Context);
+    const [isDarkMode, setIsDarkMode,profile] = useContext(Context);
     const toggleTheme = () => {
         setIsDarkMode((prevMode) => !prevMode);
       };
+      console.log('Navbar:',profile);
     return (   
         <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>     
         <Navbar>
@@ -38,7 +39,7 @@ export function NavigationBar(){
                         </Search>
                     </SearchWrapper>
                     <Navbuttons>
-                        <NavButton onClick={()=>{window.location.href = "signin"}}>Sign in</NavButton>
+                        <NavButton onClick={()=>{window.location.href = profile?"/dashboard":"/signin"}}>{!profile?"Sign in":"Dashboard"}</NavButton>
                         <NavButton style={{background:"#0A65CC",color:"white"}}>Post A Job</NavButton>
 
                     </Navbuttons>
