@@ -17,11 +17,13 @@ import LogoImage from '../assets/Logo.svg'
 import { FooterBar } from '../components/footer.jsx'
 import { ThemeProvider } from 'styled-components';
 import { lightTheme, darkTheme } from '../utils/theme.js';
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { Context } from '../App.jsx'
 
+
 export function HomePage(){
-    const [isDarkMode, setIsDarkMode] = useContext(Context);
+    const [isDarkMode, profile] = useContext(Context);
+    
     const categoriesData = [
         { title: "Graphics & Design", positions: "357 Open position", icon: <img src={Graphics} alt="Graphics & Design Icon" /> },
         { title: "Code & Programming", positions: "312 Open position", icon: <img src={Coding} alt="Code & Programming Icon" /> },
@@ -32,6 +34,9 @@ export function HomePage(){
         { title: "Health & Care", positions: "145 Open position", icon: <img src={Health} alt="Health & Care Icon" /> },
         { title: "Data & Science", positions: "95 Open position", icon: <img src={Database} alt="Data & Science Icon" style={{ width: '24px', height: '24px' }} /> },
     ];
+
+
+
         return(
         <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}> 
         <Home>

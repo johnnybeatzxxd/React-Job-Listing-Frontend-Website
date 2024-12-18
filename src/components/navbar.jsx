@@ -17,7 +17,7 @@ export function NavigationBar(){
     const toggleTheme = () => {
         setIsDarkMode((prevMode) => !prevMode);
       };
-      console.log('Navbar:',profile);
+
     return (   
         <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>     
         <Navbar>
@@ -73,6 +73,13 @@ const NavTab = styled.button`
     border-bottom: 2px solid transparent;
     &:hover {
         border-bottom: 2px solid #0A65CC;
+    }
+    &:active {
+        border-bottom: none;
+    }
+    &:focus {
+        border-bottom: none;
+        outline: none;
     }
 `
 const Tabs  = styled.div`

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { styled } from 'styled-components'
 import '../index.css'
 import { NavigationBar } from '../components/navbar.jsx'
-import { FooterBar } from '../components/footer.jsx'
+import { Atom, FourSquare, Mosaic } from "react-loading-indicators";
 import BriefCaseGrey from '../assets/briefcase-grey.svg'
 import BriefCase     from '../assets/briefcase.svg'
 import Stack from '../assets/Stack.svg'
@@ -17,16 +17,33 @@ import Logout from '../assets/logout.svg'
 
 import { OverView } from '../components/overview-dash.jsx'
 import { AppliedJobs } from '../components/applied-dash.jsx'
+import { logout } from '../utils/auth-requests.js'
 
 import { ThemeProvider } from 'styled-components';
 import { lightTheme, darkTheme } from '../utils/theme.js';
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { Context } from '../App.jsx'
 
 export function DashboardPage(){
     const [selectedBar, setSelectedBar] = useState("overview")
-    const [isDarkMode, setIsDarkMode] = useContext(Context);
-
+    const [isDarkMode, setIsDarkMode,profile,setProfile] = useContext(Context);
+    console.log("thisis the dashnoard",profile);
+    if(profile === null){
+        window.location.href = "/signin";
+    }
+    if (profile === "Profile not found"){
+        window.location.href = '/set-profile'
+    }
+    const handleLogout = () => {
+        logout().then((response) => {
+            if(response.success){
+                setProfile(null);
+                localStorage.removeItem('csrfToken');
+                window.location.href = "/";
+                
+            }
+        })
+    }
     return(
         <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}> 
         <Dashboard>
@@ -66,13 +83,21 @@ export function DashboardPage(){
                     <img src={selectedBar === "setting" ? Setting : SettingGrey} style={{ width: '23px', height: '23px' }} alt="Settings" />
                     <span style={selectedBar === "setting" ? { color: '#0066cc' } : {color: isDarkMode ? '#e8e6e3' : '#18191c'}}>Settings</span>
                 </SideBarItem>
-                <LogoutItem>
+                <LogoutItem onClick={handleLogout}>
                     <img src={Logout}  style={{ width: '23px', height: '23px', }} alt="Logout" />
                     <span style={{color: isDarkMode ? '#e8e6e3' : '#18191c'}}>Logout</span>
                 </LogoutItem>
             </SideBar>
-            {selectedBar === "overview" && <OverView setSelectedBar={setSelectedBar}/>}
-            {selectedBar === "appliedJobs" && <AppliedJobs />}
+                {profile === "Profile" ? (
+                    <Content style={{ justifyContent: 'center', alignItems: 'center', display: 'flex', height: '100%' }}>
+                        <FourSquare color="#0B65C6" size="medium" text="" textColor="" />
+                    </Content>
+                ) : (
+                    <>
+                        {selectedBar === "overview" && <OverView setSelectedBar={setSelectedBar}/>}
+                        {selectedBar === "appliedJobs" && <AppliedJobs />}
+                    </>
+                )}
             </Content>
         </DashboardContainer>
     </Dashboard>

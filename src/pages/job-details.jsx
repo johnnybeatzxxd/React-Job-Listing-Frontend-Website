@@ -68,7 +68,7 @@ Want to work with us? You're in good company!`,
 
 export function JobDetails(){
     const [modal, setModal] = useState(false);
-    const [isDarkMode] = useContext(Context);
+    const [isDarkMode,profile] = useContext(Context);
 
     return(
     <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>

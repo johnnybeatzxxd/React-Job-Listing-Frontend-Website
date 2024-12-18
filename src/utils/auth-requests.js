@@ -88,7 +88,7 @@ export function get_profile() {
             return { success: true, message: response.data.profile };
         })
         .catch((error) => {
-            console.log(error.response.data.error);
+            console.log(error);
             return { success: false, message: error.response.data.error || 'An error occurred' };
         });
 }

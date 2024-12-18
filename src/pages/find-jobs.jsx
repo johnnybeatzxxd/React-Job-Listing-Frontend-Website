@@ -11,7 +11,7 @@ import { useContext } from 'react'
 import { Context } from '../App.jsx'
 
 export function FindJobs(){
-    const [isDarkMode, setIsDarkMode] = useContext(Context);
+    const [isDarkMode, setIsDarkMode,profile] = useContext(Context);
     const jobs = [
         {
             title: "Create web blog about Design with Django framework",

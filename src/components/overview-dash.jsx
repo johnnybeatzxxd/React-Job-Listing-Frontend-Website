@@ -20,12 +20,18 @@ import { useContext } from 'react'
 import { Context } from '../App.jsx'
 
 export function OverView({setSelectedBar}){
-    const [isDarkMode, setIsDarkMode] = useContext(Context);
+    const [isDarkMode, setIsDarkMode, profile] = useContext(Context);
+    let firstName = '';
+    try {
+        firstName = profile.full_name.split(" ")[0];
+    } catch {
+        firstName = profile.full_name;
+    }
     return(
         <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}> 
         <Dash>
         <DashContent>
-            <Greeting>Hello, Esther Howard</Greeting>
+            <Greeting>Hello, {firstName}</Greeting>
             <SubText>Here is your daily activities and job alerts</SubText>
             
             <StatsContainer>
@@ -48,7 +54,7 @@ export function OverView({setSelectedBar}){
                 </StatBox>
             </StatsContainer>
 
-            {/* Recently Applied Section */}
+           
             <RecentlyAppliedSection>
                 <HeaderRow>
                     <h3>Recently Applied</h3>

@@ -6,12 +6,15 @@ import { JobDetails } from './pages/job-details';
 import { DashboardPage } from './pages/dashboard';
 import { SignupPage } from './pages/signup';
 import { SigninPage } from './pages/signin';
+import { ProfileSetupPage } from './pages/profile';
 import './index.css'
 import { createContext, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
+import { get_profile } from './utils/auth-requests.js';
+
 export const Context = createContext()
 function App() {
-
+  const [profile, setProfile] = useState('Profile');
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const savedTheme = localStorage.getItem('theme');
     return savedTheme ? savedTheme === 'dark' : false;
@@ -21,11 +24,27 @@ function App() {
     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
+  useEffect(() => {
+    
+    get_profile().then((data) => {
+      if (data.message === 'Profile not found') {
+        setProfile("Profile not found");
+        
+      }
+      else if (data.message === 'Authentication required') {
+        setProfile(null);
+      }
+      else {
+        setProfile(data.message);
+      }
+    });
+  },
+     []);
 
   return (
     <>
       <Toaster position="top-right" />
-      <Context.Provider value={[isDarkMode,setIsDarkMode]}>
+      <Context.Provider value={[isDarkMode,setIsDarkMode,profile,setProfile]}>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<HomePage />} /> 
@@ -34,6 +53,7 @@ function App() {
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="signup" element={<SignupPage />} />
             <Route path="signin" element={<SigninPage />} />
+            <Route path="set-profile" element={<ProfileSetupPage />} />
           </Routes>
         </BrowserRouter>
       </Context.Provider>
