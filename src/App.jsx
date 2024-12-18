@@ -15,6 +15,7 @@ import { get_profile } from './utils/auth-requests.js';
 export const Context = createContext()
 function App() {
   const [profile, setProfile] = useState('Profile');
+  const [user, setUser] = useState();
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const savedTheme = localStorage.getItem('theme');
     return savedTheme ? savedTheme === 'dark' : false;
@@ -25,10 +26,11 @@ function App() {
   }, [isDarkMode]);
 
   useEffect(() => {
-    
+    console.log("request sent!!");
     get_profile().then((data) => {
       if (data.message === 'Profile not found') {
         setProfile("Profile not found");
+        setUser({'fullName':data.user.full_name,'role':data.user.role})
         
       }
       else if (data.message === 'Authentication required') {
@@ -44,7 +46,7 @@ function App() {
   return (
     <>
       <Toaster position="top-right" />
-      <Context.Provider value={[isDarkMode,setIsDarkMode,profile,setProfile]}>
+      <Context.Provider value={[isDarkMode,setIsDarkMode,profile,user]}>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<HomePage />} /> 

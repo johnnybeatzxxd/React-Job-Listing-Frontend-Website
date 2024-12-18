@@ -89,7 +89,7 @@ export function get_profile() {
         })
         .catch((error) => {
             console.log(error);
-            return { success: false, message: error.response.data.error || 'An error occurred' };
+            return { success: false, message: error.response.data.error || 'An error occurred',user: error.response.data.user };
         });
 }
 

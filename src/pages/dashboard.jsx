@@ -26,7 +26,7 @@ import { Context } from '../App.jsx'
 
 export function DashboardPage(){
     const [selectedBar, setSelectedBar] = useState("overview")
-    const [isDarkMode, setIsDarkMode,profile,setProfile] = useContext(Context);
+    const [isDarkMode, setIsDarkMode,profile] = useContext(Context);
     console.log("thisis the dashnoard",profile);
     if(profile === null){
         window.location.href = "/signin";
@@ -37,7 +37,7 @@ export function DashboardPage(){
     const handleLogout = () => {
         logout().then((response) => {
             if(response.success){
-                setProfile(null);
+                
                 localStorage.removeItem('csrfToken');
                 window.location.href = "/";
                 
