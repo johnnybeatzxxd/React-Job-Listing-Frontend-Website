@@ -4,6 +4,7 @@ import { lightTheme, darkTheme } from '../utils/theme.js';
 import { Context } from '../App.jsx';
 import { toast } from 'react-hot-toast';
 import { useSearchParams } from 'react-router-dom';
+import { FourSquare } from "react-loading-indicators";
 
 import MoonIcon from '../assets/moon.svg';
 import SunIcon from '../assets/sun.svg';
@@ -14,14 +15,16 @@ import { CountryDropdown } from '../components/countries-dropdown.jsx';
 
 import { create_profile } from '../utils/auth-requests.js';
 
-export function CandidateProfileSetup({fullName}) {
+export function CandidateProfileSetup({user}) {
   const [searchParams] = useSearchParams();
   const [isDarkMode, setIsDarkMode] = useContext(Context);
   const [profileImage, setProfileImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(DefaultAvatar);
+  const [isLoading, setIsLoading] = useState(false);
   
   const [formData, setFormData] = useState({
-    fullName: fullName || '',
+    role: user.role,
+    fullName: user.fullName || '',
     title: '',
     country: '',
     email: '',
@@ -99,7 +102,21 @@ export function CandidateProfileSetup({fullName}) {
     }
 
     try {
-      const response = await create_profile(formData);
+      setIsLoading(true);
+      
+      const profileFormData = new FormData();
+      
+      // Add all form data to FormData
+      Object.keys(formData).forEach(key => {
+        profileFormData.append(key, formData[key]);
+      });
+
+      // Add profile image if exists
+      if (profileImage) {
+        profileFormData.append('profileImage', profileImage);
+      }
+
+      const response = await create_profile(profileFormData);
       if (response.success) {
         toast.success('Profile updated successfully!');
         window.location.href = "/";
@@ -108,6 +125,8 @@ export function CandidateProfileSetup({fullName}) {
       }
     } catch (error) {
       toast.error(error.message || 'An error occurred while updating profile');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -118,6 +137,11 @@ export function CandidateProfileSetup({fullName}) {
   return (
     <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
       <ProfileContainer>
+        {isLoading && (
+          <LoadingModal>
+            <FourSquare color="#0A65CC" size="medium" />
+          </LoadingModal>
+        )}
         <ContentWrapper>
           <Logo onClick={() => {window.location.href = "/"}} src={isDarkMode ? LogoDark : LogoImage} alt="Logo" />
           <ThemeIcon onClick={toggleTheme} src={isDarkMode ? SunIcon : MoonIcon} alt="Theme Toggle" />
@@ -416,5 +440,19 @@ const SaveButton = styled.button`
     background-color: #085299;
   }
 `;
+
+const LoadingModal = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
 
 

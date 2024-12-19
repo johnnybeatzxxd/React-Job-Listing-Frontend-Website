@@ -10,6 +10,7 @@ const backend_url = import.meta.env.VITE_BACKEND_URL;
 
 function createRequestConfig(url, data, method = 'post') {
     const csrftoken = localStorage.getItem('csrfToken');
+    const isFormData = data instanceof FormData;
 
     return {
         method: method,
@@ -17,7 +18,7 @@ function createRequestConfig(url, data, method = 'post') {
         url: url,
         ...(data && { data: data }),
         headers: {
-            'Content-Type': 'application/json',
+            ...(!isFormData && { 'Content-Type': 'application/json' }),
             ...(csrftoken && { 'X-CSRFToken': csrftoken }),
         },
         withCredentials: true,
@@ -67,16 +68,20 @@ export function signin(formData) {
 }
 
 export function create_profile(formData) {
-
-    const config = createRequestConfig(`${backend_url}/api/auth/set_profile`,JSON.stringify(formData));
+    const config = createRequestConfig(
+        `${backend_url}/api/auth/set_profile`,
+        formData instanceof FormData ? formData : JSON.stringify(formData)
+    );
+    
     return axios.request(config)
         .then((response) => {
             console.log(JSON.stringify(response.data));
             return { success: true, message: response.data.message };
         })
         .catch((error) => {
-            console.log(error.response.data.error);
-            return { success: false, message: error.response.data.error || 'An error occurred' };
+            console.log(error);
+            const errorMessage = error.response?.data?.error || error.message || 'An error occurred';
+            return { success: false, message: errorMessage };
         });
 }
 

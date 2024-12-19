@@ -11,7 +11,7 @@ import { Atom, FourSquare, Mosaic } from "react-loading-indicators";
 export function ProfileSetupPage() {
   const [searchParams] = useSearchParams();
   const [isDarkMode, setIsDarkMode,profile,user] = useContext(Context);
-  console.log('this is the user:',user);
+
 
   if (!user){
     return(<LoadingIndicator>
@@ -19,10 +19,10 @@ export function ProfileSetupPage() {
     </LoadingIndicator>)
   }
   if (user.role === "candidate"){
-    return(<CandidateProfileSetup fullName={user.fullName}/>)
+    return(<CandidateProfileSetup user={user}/>)
   }
   if (user.role === "recruiter"){
-    return(<RecruiterProfileSetup fullName={user.fullnName}/>)
+    return(<RecruiterProfileSetup user={user}/>)
   }
   
 }

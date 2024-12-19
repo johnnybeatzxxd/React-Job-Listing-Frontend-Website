@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { styled } from 'styled-components'
 import '../index.css'
 import { NavigationBar } from '../components/navbar.jsx'
-import { Atom, FourSquare, Mosaic } from "react-loading-indicators";
+import { FourSquare } from "react-loading-indicators";
 import BriefCaseGrey from '../assets/briefcase-grey.svg'
 import BriefCase     from '../assets/briefcase.svg'
 import Stack from '../assets/Stack.svg'
@@ -16,6 +16,7 @@ import Favorite from '../assets/favorite.svg'
 import Logout from '../assets/logout.svg'
 
 import { OverView } from '../components/overview-dash.jsx'
+import { RecruitersOverView } from '../components/overview-recruiters.jsx';
 import { AppliedJobs } from '../components/applied-dash.jsx'
 import { logout } from '../utils/auth-requests.js'
 
@@ -23,6 +24,8 @@ import { ThemeProvider } from 'styled-components';
 import { lightTheme, darkTheme } from '../utils/theme.js';
 import { useContext, useEffect } from 'react'
 import { Context } from '../App.jsx'
+
+
 
 export function DashboardPage(){
     const [selectedBar, setSelectedBar] = useState("overview")
@@ -44,64 +47,130 @@ export function DashboardPage(){
             }
         })
     }
+    if (profile === "Profile"){
+        return(
+            <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
+                <LoadingScreen>
+                    <NavigationBar/>
+                    <LoadingContainer>
+                        <FourSquare color="#0B65C6" size="medium" text="" textColor="" />
+                    </LoadingContainer>
+                </LoadingScreen>
+            </ThemeProvider>
+        )
+    }
+ 
+    const renderSidebarItems = () => {
+        if (profile.role === 'recruiter') {
+            return (
+                <>
+                    <Title>RECRUITER DASHBOARD</Title>
+                    <SideBarItem 
+                        style={selectedBar === "overview" ? { backgroundColor: isDarkMode ? '#1f2223' : '#f1f2f4', borderLeft: "3px solid #0B65C6" } : {}}
+                        onClick={() => setSelectedBar("overview")}>
+                        <img src={selectedBar === "overview" ? Stack : StackGrey} style={{ width: '23px', height: '23px' }} alt="Overview" />
+                        <span style={selectedBar === "overview" ? { color: '#0066cc' } : {color: isDarkMode ? '#e8e6e3' : '#18191c'}}>Overview</span>
+                    </SideBarItem>
+                    <SideBarItem 
+                        style={selectedBar === "postings" ? { backgroundColor: isDarkMode ? '#1f2223' : '#f1f2f4', borderLeft: "3px solid #0B65C6" } : {}}
+                        onClick={() => setSelectedBar("postings")}>
+                        <img src={selectedBar === "postings" ? BriefCase : BriefCaseGrey} style={{ width: '23px', height: '23px' }} alt="Job Postings" />
+                        <span style={selectedBar === "postings" ? { color: '#0066cc' } : {color: isDarkMode ? '#e8e6e3' : '#18191c'}}>Job Postings</span>
+                    </SideBarItem>
+                    <SideBarItem 
+                        style={selectedBar === "applications" ? { backgroundColor: isDarkMode ? '#1f2223' : '#f1f2f4', borderLeft: "3px solid #0B65C6" } : {}}
+                        onClick={() => setSelectedBar("applications")}>
+                        <img src={selectedBar === "applications" ? Favorite : FavoriteGrey} style={{ width: '23px', height: '23px' }} />
+                        <span style={selectedBar === "applications" ? { color: '#0066cc' } : {color: isDarkMode ? '#e8e6e3' : '#18191c'}}>Applications</span>
+                    </SideBarItem>
+                    <SideBarItem 
+                        style={selectedBar === "candidates" ? { backgroundColor: isDarkMode ? '#1f2223' : '#f1f2f4', borderLeft: "3px solid #0B65C6" } : {}}
+                        onClick={() => setSelectedBar("candidates")}>
+                        <img src={selectedBar === "candidates" ? Bell : BellGrey} alt="Candidates" style={{ width: '23px', height: '23px' }} />
+                        <span style={selectedBar === "candidates" ? { color: '#0066cc' } : {color: isDarkMode ? '#e8e6e3' : '#18191c'}}>Candidates</span>
+                    </SideBarItem>
+                </>
+            );
+        } else {
+            return (
+                <>
+                    <Title>CANDIDATE DASHBOARD</Title>
+                    <SideBarItem 
+                        style={selectedBar === "overview" ? { backgroundColor: isDarkMode ? '#1f2223' : '#f1f2f4', borderLeft: "3px solid #0B65C6" } : {}}
+                        onClick={() => setSelectedBar("overview")}>
+                        <img src={selectedBar === "overview" ? Stack : StackGrey} style={{ width: '23px', height: '23px' }} alt="Overview" />
+                        <span style={selectedBar === "overview" ? { color: '#0066cc' } : {color: isDarkMode ? '#e8e6e3' : '#18191c'}}>Overview</span>
+                    </SideBarItem>
+                    <SideBarItem 
+                        style={selectedBar === "appliedJobs" ? { backgroundColor: isDarkMode ? '#1f2223' : '#f1f2f4', borderLeft: "3px solid #0B65C6" } : {}}
+                        onClick={() => setSelectedBar("appliedJobs")}>
+                        <img src={selectedBar === "appliedJobs" ? BriefCase : BriefCaseGrey} style={{ width: '23px', height: '23px' }} alt="Applied Jobs" />
+                        <span style={selectedBar === "appliedJobs" ? { color: '#0066cc' } : {color: isDarkMode ? '#e8e6e3' : '#18191c'}}>Applied Jobs</span>
+                    </SideBarItem>
+                    <SideBarItem 
+                        style={selectedBar === "favorite" ? { backgroundColor: isDarkMode ? '#1f2223' : '#f1f2f4', borderLeft: "3px solid #0B65C6" } : {}}
+                        onClick={() => setSelectedBar("favorite")}>
+                        <img src={selectedBar === "favorite" ? Favorite : FavoriteGrey} style={{ width: '23px', height: '23px' }} />
+                        <span style={selectedBar === "favorite" ? { color: '#0066cc' } : {color: isDarkMode ? '#e8e6e3' : '#18191c'}}>Favorite Jobs</span>
+                    </SideBarItem>
+                    <SideBarItem 
+                        style={selectedBar === "alert" ? { backgroundColor: isDarkMode ? '#1f2223' : '#f1f2f4', borderLeft: "3px solid #0B65C6" } : {}}
+                        onClick={() => setSelectedBar("alert")}>
+                        <img src={selectedBar === "alert" ? Bell : BellGrey} alt="Job Alert" style={{ width: '23px', height: '23px' }} />
+                        <span style={selectedBar === "alert" ? { color: '#0066cc' } : {color: isDarkMode ? '#e8e6e3' : '#18191c'}}>Job Alert</span>
+                        <span style={{ marginLeft: 'auto', backgroundColor: isDarkMode ? '#0066cc' : '#0066cc', padding: '2px 6px', borderRadius: '10px' }}>09</span>
+                    </SideBarItem>
+                </>
+            );
+        }
+    };
+
+    const renderMainContent = () => {
+        if (profile.role === 'recruiter') {
+            return (
+                <>
+                    {selectedBar === "overview" && <RecruitersOverView setSelectedBar={setSelectedBar}/>}
+                    {selectedBar === "postings" && <JobPostings />}
+                    {selectedBar === "applications" && <Applications />}
+                    {selectedBar === "candidates" && <Candidates />}
+                </>
+            );
+        } else {
+            return (
+                <>
+                    {selectedBar === "overview" && <OverView setSelectedBar={setSelectedBar}/>}
+                    {selectedBar === "appliedJobs" && <AppliedJobs />}
+                    {selectedBar === "favorite" && <FavoriteJobs />}
+                    {selectedBar === "alert" && <JobAlerts />}
+                </>
+            );
+        }
+    };
+
     return(
         <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}> 
         <Dashboard>
             <NavigationBar/>
-                <DashboardContainer>
-            <Content>     
-            <SideBar>
-                <Title>CANDIDATE DASHBOARD</Title>
-                <SideBarItem 
-                    style={selectedBar === "overview" ? { backgroundColor: isDarkMode ? '#1f2223' : '#f1f2f4', borderLeft: "3px solid #0B65C6" } : {}}
-                    onClick={() => setSelectedBar("overview")}>
-                    <img src={selectedBar === "overview" ? Stack : StackGrey} style={{ width: '23px', height: '23px' }} alt="Overview" />
-                    <span style={selectedBar === "overview" ? { color: '#0066cc' } : {color: isDarkMode ? '#e8e6e3' : '#18191c'}}>Overview</span>
-                </SideBarItem>
-                <SideBarItem 
-                    style={selectedBar === "appliedJobs" ? { backgroundColor: isDarkMode ? '#1f2223' : '#f1f2f4', borderLeft: "3px solid #0B65C6" } : {}}
-                    onClick={() => setSelectedBar("appliedJobs")}>
-                    <img src={selectedBar === "appliedJobs" ? BriefCase : BriefCaseGrey} style={{ width: '23px', height: '23px' }} alt="Applied Jobs" />
-                    <span style={selectedBar === "appliedJobs" ? { color: '#0066cc' } : {color: isDarkMode ? '#e8e6e3' : '#18191c'}}>Applied Jobs</span>
-                </SideBarItem>
-                <SideBarItem 
-                    style={selectedBar === "favorite" ? { backgroundColor: isDarkMode ? '#1f2223' : '#f1f2f4', borderLeft: "3px solid #0B65C6" } : {}}
-                    onClick={() => setSelectedBar("favorite")}>
-                    <img src={selectedBar === "favorite" ? Favorite : FavoriteGrey} style={{ width: '23px', height: '23px' }} />
-                    <span style={selectedBar === "favorite" ? { color: '#0066cc' } : {color: isDarkMode ? '#e8e6e3' : '#18191c'}}>Favorite Jobs</span>
-                </SideBarItem>
-                <SideBarItem 
-                    style={selectedBar === "alert" ? { backgroundColor: isDarkMode ? '#1f2223' : '#f1f2f4', borderLeft: "3px solid #0B65C6" } : {}}
-                    onClick={() => setSelectedBar("alert")}>
-                    <img src={selectedBar === "alert" ? Bell : BellGrey} alt="Job Alert" style={{ width: '23px', height: '23px' }} />
-                    <span style={selectedBar === "alert" ? { color: '#0066cc' } : {color: isDarkMode ? '#e8e6e3' : '#18191c'}}>Job Alert</span>
-                    <span style={{ marginLeft: 'auto', backgroundColor: isDarkMode ? '#0066cc' : '#0066cc', padding: '2px 6px', borderRadius: '10px' }}>09</span>
-                </SideBarItem>
-                <SideBarItem 
-                    style={selectedBar === "setting" ? { backgroundColor: isDarkMode ? '#1f2223' : '#f1f2f4', borderLeft: "3px solid #0B65C6" } : {}}
-                    onClick={() => setSelectedBar("setting")}>
-                    <img src={selectedBar === "setting" ? Setting : SettingGrey} style={{ width: '23px', height: '23px' }} alt="Settings" />
-                    <span style={selectedBar === "setting" ? { color: '#0066cc' } : {color: isDarkMode ? '#e8e6e3' : '#18191c'}}>Settings</span>
-                </SideBarItem>
-                <LogoutItem onClick={handleLogout}>
-                    <img src={Logout}  style={{ width: '23px', height: '23px', }} alt="Logout" />
-                    <span style={{color: isDarkMode ? '#e8e6e3' : '#18191c'}}>Logout</span>
-                </LogoutItem>
-            </SideBar>
-                {profile === "Profile" ? (
-                    <Content style={{ justifyContent: 'center', alignItems: 'center', display: 'flex', height: '100%' }}>
-                        <FourSquare color="#0B65C6" size="medium" text="" textColor="" />
-                    </Content>
-                ) : (
-                    <>
-                        {selectedBar === "overview" && <OverView setSelectedBar={setSelectedBar}/>}
-                        {selectedBar === "appliedJobs" && <AppliedJobs />}
-                    </>
-                )}
-            </Content>
-        </DashboardContainer>
-    </Dashboard>
-    </ThemeProvider>
+            <DashboardContainer>
+                <Content>     
+                    <SideBar>
+                        {renderSidebarItems()}
+                        <SideBarItem 
+                            style={selectedBar === "setting" ? { backgroundColor: isDarkMode ? '#1f2223' : '#f1f2f4', borderLeft: "3px solid #0B65C6" } : {}}
+                            onClick={() => setSelectedBar("setting")}>
+                            <img src={selectedBar === "setting" ? Setting : SettingGrey} style={{ width: '23px', height: '23px' }} alt="Settings" />
+                            <span style={selectedBar === "setting" ? { color: '#0066cc' } : {color: isDarkMode ? '#e8e6e3' : '#18191c'}}>Settings</span>
+                        </SideBarItem>
+                        <LogoutItem onClick={handleLogout}>
+                            <img src={Logout}  style={{ width: '23px', height: '23px', }} alt="Logout" />
+                            <span style={{color: isDarkMode ? '#e8e6e3' : '#18191c'}}>Logout</span>
+                        </LogoutItem>
+                    </SideBar>
+                    {renderMainContent()}
+                </Content>
+            </DashboardContainer>
+        </Dashboard>
+        </ThemeProvider>
     )
 }
 
@@ -136,7 +205,7 @@ const Content = styled.div`
     justify-self: end;
     width: 90.3%;
     height: 100%;
-
+    background-color: ${({theme})=>theme.background};
     @media (max-width: 1024px) {
         width: 95%;
     }
@@ -218,3 +287,17 @@ const Title = styled.h2`
     }
 `
 
+const LoadingScreen = styled.div`
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
+    background-color: ${({theme}) => theme.background};
+`
+
+const LoadingContainer = styled.div`
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+`

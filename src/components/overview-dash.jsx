@@ -18,15 +18,19 @@ import { ThemeProvider } from 'styled-components';
 import { lightTheme, darkTheme } from '../utils/theme.js';
 import { useContext } from 'react'
 import { Context } from '../App.jsx'
+import { RecruitersOverView } from './overview-recruiters.jsx'
 
 export function OverView({setSelectedBar}){
     const [isDarkMode, setIsDarkMode, profile] = useContext(Context);
+
+
     let firstName = '';
     try {
         firstName = profile.full_name.split(" ")[0];
     } catch {
         firstName = profile.full_name;
     }
+    if (profile.role === "recruiter") return(<RecruitersOverView setSelectedBar={setSelectedBar}/>)
     return(
         <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}> 
         <Dash>

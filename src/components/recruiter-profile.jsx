@@ -4,6 +4,7 @@ import { lightTheme, darkTheme } from '../utils/theme.js';
 import { Context } from '../App.jsx';
 import { toast } from 'react-hot-toast';
 import { useSearchParams } from 'react-router-dom';
+import { FourSquare } from "react-loading-indicators";
 
 import MoonIcon from '../assets/moon.svg';
 import SunIcon from '../assets/sun.svg';
@@ -14,20 +15,22 @@ import { CountryDropdown } from '../components/countries-dropdown.jsx';
 
 import { create_profile } from '../utils/auth-requests.js';
 
-export function RecruiterProfileSetup({fullName}) {
+export function RecruiterProfileSetup({user}) {
   const [searchParams] = useSearchParams();
   const [isDarkMode, setIsDarkMode] = useContext(Context);
   const [profileImage, setProfileImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(DefaultAvatar);
+  const [isLoading, setIsLoading] = useState(false);
   
   const [formData, setFormData] = useState({
+    role: user.role,
     companyName: '',
-    fullName: fullName || '',
+    fullName: user.fullName || '',
     country: '',
     companySize: '',
     industry: '',
     companyWebsite: '',
-    about: '',
+    bio: '',
     linkedin: '',
     twitter: ''
   });
@@ -70,7 +73,7 @@ export function RecruiterProfileSetup({fullName}) {
       if (rate < 1) return;
     }
 
-    if (['portfolio', 'github', 'linkedin', 'twitter'].includes(name)) {
+    if (['companyWebsite', 'linkedin', 'twitter'].includes(name)) {
       let urlValue = value.trim();
       
       if (urlValue && !urlValue.match(/^https?:\/\//i)) {
@@ -98,9 +101,27 @@ export function RecruiterProfileSetup({fullName}) {
     if (!formData.industry) {
       return toast.error('Industry is required');
     }
+    if (!formData.companySize) {
+      return toast.error('Company size is required');
+    }
+    if (!formData.bio.trim()) {
+      return toast.error('Company description is required');
+    }
 
     try {
-      const response = await create_profile(formData);
+      setIsLoading(true);
+     
+      const profileFormData = new FormData();
+      
+      Object.keys(formData).forEach(key => {
+        profileFormData.append(key, formData[key]);
+      });
+
+      if (profileImage) {
+        profileFormData.append('profileImage', profileImage);
+      }
+
+      const response = await create_profile(profileFormData);
       if (response.success) {
         toast.success('Profile updated successfully!');
         window.location.href = "/";
@@ -109,6 +130,8 @@ export function RecruiterProfileSetup({fullName}) {
       }
     } catch (error) {
       toast.error(error.message || 'An error occurred while updating profile');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -119,6 +142,11 @@ export function RecruiterProfileSetup({fullName}) {
   return (
     <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
       <ProfileContainer>
+        {isLoading && (
+          <LoadingModal>
+            <FourSquare color="#0A65CC" size="medium" />
+          </LoadingModal>
+        )}
         <ContentWrapper>
           <Logo onClick={() => {window.location.href = "/"}} src={isDarkMode ? LogoDark : LogoImage} alt="Logo" />
           <ThemeIcon onClick={toggleTheme} src={isDarkMode ? SunIcon : MoonIcon} alt="Theme Toggle" />
@@ -203,33 +231,33 @@ export function RecruiterProfileSetup({fullName}) {
                   name="companyWebsite"
                   value={formData.companyWebsite}
                   onChange={handleChange}
-                  placeholder="https://www.company.com"
+                  placeholder="https://www.company.com (optional)"
                 />
 
                 <InputLabel>About Company</InputLabel>
                 <TextArea
-                  name="about"
-                  value={formData.about}
+                  name="bio"
+                  value={formData.bio}
                   onChange={handleChange}
                   placeholder="Tell us about your company..."
                   rows="4"
                 />
 
                 <SocialSection>
-                  <InputLabel>Social Links</InputLabel>
+                  <InputLabel>Social Links (Optional)</InputLabel>
                   <Input
                     type="url"
                     name="linkedin"
                     value={formData.linkedin}
                     onChange={handleChange}
-                    placeholder="LinkedIn Company Page"
+                    placeholder="LinkedIn Company Page (optional)"
                   />
                   <Input
                     type="url"
                     name="twitter"
                     value={formData.twitter}
                     onChange={handleChange}
-                    placeholder="Twitter Profile"
+                    placeholder="Twitter Profile (optional)"
                   />
                 </SocialSection>
               </InputGroup>
@@ -436,6 +464,19 @@ const Select = styled.select`
     outline: none;
     border-color: #0A65CC;
   }
+`;
+
+const LoadingModal = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 `;
 
 
