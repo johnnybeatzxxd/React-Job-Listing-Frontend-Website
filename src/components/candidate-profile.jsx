@@ -103,15 +103,11 @@ export function CandidateProfileSetup({user}) {
 
     try {
       setIsLoading(true);
-      
       const profileFormData = new FormData();
-      
-      // Add all form data to FormData
       Object.keys(formData).forEach(key => {
         profileFormData.append(key, formData[key]);
       });
 
-      // Add profile image if exists
       if (profileImage) {
         profileFormData.append('profileImage', profileImage);
       }

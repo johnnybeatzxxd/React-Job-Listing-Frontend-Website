@@ -18,7 +18,7 @@ export function CountryDropdown({ value, onChange, required }) {
     { name: 'Italy', code: 'IT', flag: '🇮🇹' },
     { name: 'Japan', code: 'JP', flag: '🇯🇵' },
     { name: 'South Korea', code: 'KR', flag: '🇰🇷' },
-    // Add more countries as needed
+
   ];
 
   useEffect(() => {
@@ -33,11 +33,11 @@ export function CountryDropdown({ value, onChange, required }) {
   }, []);
 
   const handleSelect = (country) => {
-    onChange(country.name);
+    onChange(`${country.flag} ${country.name}`);
     setIsOpen(false);
   };
 
-  const selectedCountry = countries.find(country => country.name === value);
+  const selectedCountry = countries.find(country => country.name === value || `${country.flag} ${country.name}` === value);
 
   return (
     <DropdownContainer ref={dropdownRef}>

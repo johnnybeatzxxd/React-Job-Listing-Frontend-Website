@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { styled, ThemeProvider } from 'styled-components';
 import { lightTheme, darkTheme } from '../utils/theme.js';
 import { Context } from '../App.jsx';
@@ -12,19 +12,24 @@ import LogoDark from '../assets/Logo-dark.svg';
 import { postJob } from '../utils/job-requests.js'
 
 export function PostJob() {
-  const [isDarkMode, setIsDarkMode,profile,user] = useContext(Context);
+  const [isDarkMode, setIsDarkMode, profile, user] = useContext(Context);
   const [isLoading, setIsLoading] = useState(false);
   const [jobTags, setJobTags] = useState(['']);
 
-  if(profile === null){
-    window.location.href = "/signin";
-  }
+  // Redirect if no profile
+  useEffect(() => {
+    if (!profile) {
+      window.location.href = "/signin";
+    }
+  }, [profile]);
+
 
   const [formData, setFormData] = useState({
-    companyId: profile.email,
+    companyId: '',  
     jobTitle: '',
+    country: '',    
     jobType: '',
-    salaryType: '', 
+    salaryType: '',
     professionLevel: '',
     estimatedBudget: '',
     maxApplicants: '',
@@ -35,9 +40,19 @@ export function PostJob() {
     desirables: ['']
   });
 
+
+  useEffect(() => {
+    if (profile) {
+      setFormData(prev => ({
+        ...prev,
+        companyId: profile.email || '',
+        country: profile.country || ''
+      }));
+    }
+  }, [profile]);
   const salaryTypeOptions = ['Fixed', 'Hourly'];
   const professionLevelOptions = [
-    'Entry Level',
+    'Entry',
     'Intermediate', 
     'Senior',
     'Lead',
@@ -120,12 +135,23 @@ export function PostJob() {
   };
 
   const handleSkillChange = (tag) => {
-    setFormData(prev => ({
-      ...prev,
-      tags: prev.tags.includes(tag)
-        ? prev.tags.filter(s => s !== tag)
-        : [...prev.tags, tag]
-    }));
+    setFormData(prev => {
+      if (prev.tags.includes(tag)) {
+        return {
+          ...prev,
+          tags: prev.tags.filter(s => s !== tag)
+        };
+      }
+
+      if (prev.tags.length < 5) {
+        return {
+          ...prev,
+          tags: [...prev.tags, tag]
+        };
+      }
+      toast.error('Maximum 5 tags allowed');
+      return prev;
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -211,7 +237,7 @@ export function PostJob() {
 
                 <Row>
                   <Column>
-                    <InputLabel>Job Type</InputLabel> {/* Changed order */}
+                    <InputLabel>Job Type</InputLabel> 
                     <Select
                       name="jobType"
                       value={formData.jobType}
@@ -226,7 +252,7 @@ export function PostJob() {
                   </Column>
 
                   <Column>
-                    <InputLabel>Salary Type</InputLabel> {/* Changed order */}
+                    <InputLabel>Salary Type</InputLabel> 
                     <Select
                       name="salaryType"
                       value={formData.salaryType}
