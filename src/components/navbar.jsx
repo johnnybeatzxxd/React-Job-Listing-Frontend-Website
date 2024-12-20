@@ -40,7 +40,7 @@ export function NavigationBar(){
                     </SearchWrapper>
                     <Navbuttons>
                         <NavButton onClick={()=>{window.location.href = profile?"/dashboard":"/signin"}}>{!profile?"Sign in":"Dashboard"}</NavButton>
-                        <NavButton style={{background:"#0A65CC",color:"white"}}>Post A Job</NavButton>
+                        <NavButton onClick={()=> window.location.href = '/post-job'} style={{background:"#0A65CC",color:"white"}}>Post A Job</NavButton>
 
                     </Navbuttons>
                 </Navbody>

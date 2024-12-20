@@ -429,7 +429,7 @@ const SkillChip = styled.div`
   }
 `;
 
-const SocialSection = styled.div`
+export const SocialSection = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;

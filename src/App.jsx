@@ -11,6 +11,7 @@ import './index.css'
 import { createContext, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { get_profile } from './utils/auth-requests.js';
+import { PostJob } from './pages/post-job.jsx';
 
 export const Context = createContext()
 function App() {
@@ -56,6 +57,7 @@ function App() {
             <Route path="signup" element={<SignupPage />} />
             <Route path="signin" element={<SigninPage />} />
             <Route path="set-profile" element={<ProfileSetupPage />} />
+            <Route path="post-job" element={<PostJob />} />
           </Routes>
         </BrowserRouter>
       </Context.Provider>

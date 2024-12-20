@@ -91,7 +91,7 @@ export function DashboardPage(){
                     </SideBarItem>
                 </>
             );
-        } else {
+        } if (profile.role === 'candidate') {
             return (
                 <>
                     <Title>CANDIDATE DASHBOARD</Title>

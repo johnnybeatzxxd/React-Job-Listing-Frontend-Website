@@ -58,6 +58,7 @@ export function SignupPage() {
     }
     
     console.log('form submitted successfully!');
+    console.log(formData)
     signup(formData).then((result) => {
         if (!result.success) {
             const errorMessage = typeof result.message === 'string' ? result.message : JSON.stringify(result.message);
@@ -65,7 +66,7 @@ export function SignupPage() {
         } else {
             const successMessage = typeof result.message === 'string' ? result.message : JSON.stringify(result.message);
             toast.success(successMessage);
-            window.location.href = '/set-profile?fullName=' + formData.fullName+'&role='+formData.role;
+            window.location.href = '/set-profile';
         }
     });
   };
@@ -160,8 +161,27 @@ export function SignupPage() {
             <SubTitle>Already have an account? <a onClick={()=>{window.location.href = '/signin'} }>Login</a></SubTitle>
             
             <ButtonGroup>
-              <RoleButton style={role === 'Candidate' ? { backgroundColor: '#0A65CC', color: 'white' } : {backgroundColor: 'transparent', color: '#0A65CC'}} onClick={() => setRole('Candidate')} active>Candidate</RoleButton>
-              <RoleButton style={role === 'Recruiter' ? { backgroundColor: '#0A65CC', color: 'white' } : {backgroundColor: 'transparent', color: '#0A65CC'}} onClick={() => setRole('Recruiter')}>Recruiter</RoleButton>
+            <RoleButton 
+                style={role === 'Candidate' ? { backgroundColor: '#0A65CC', color: 'white' } : {backgroundColor: 'transparent', color: '#0A65CC'}} 
+                onClick={() => {
+                  setRole('Candidate');
+                  setFormData(prev => ({ ...prev, role: 'Candidate' }));
+                }}
+              >
+                Candidate
+              </RoleButton>
+
+              <RoleButton 
+                style={role === 'Recruiter' ? { backgroundColor: '#0A65CC', color: 'white' } : {backgroundColor: 'transparent', color: '#0A65CC'}} 
+                onClick={() => {
+                  setRole('Recruiter');
+                  setFormData(prev => ({ ...prev, role: 'Recruiter' }));
+                }}
+              >
+                Recruiter
+              </RoleButton>
+
+              
             </ButtonGroup>
 
             <Form onSubmit={handleSubmit}>

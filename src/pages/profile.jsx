@@ -14,6 +14,7 @@ export function ProfileSetupPage() {
 
 
   if (!user){
+    if (!profile) window.location.href = '/signin';
     return(<LoadingIndicator>
       <FourSquare color="#0B65C6" size="medium" text="" textColor="" />
     </LoadingIndicator>)
