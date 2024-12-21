@@ -11,14 +11,10 @@ export function CountryDropdown({ value, onChange, required }) {
     { name: 'United States', code: 'US', flag: '🇺🇸' },
     { name: 'Canada', code: 'CA', flag: '🇨🇦' },
     { name: 'United Kingdom', code: 'GB', flag: '🇬🇧' },
-    { name: 'Australia', code: 'AU', flag: '🇦🇺' },
+    { name: 'Australia', code: 'AU', flag: '🇦🇺'},
+    { name: 'Ethiopia', code: 'ETH', flag: '🇪🇹'},
     { name: 'Germany', code: 'DE', flag: '🇩🇪' },
     { name: 'France', code: 'FR', flag: '🇫🇷' },
-    { name: 'Spain', code: 'ES', flag: '🇪🇸' },
-    { name: 'Italy', code: 'IT', flag: '🇮🇹' },
-    { name: 'Japan', code: 'JP', flag: '🇯🇵' },
-    { name: 'South Korea', code: 'KR', flag: '🇰🇷' },
-
   ];
 
   useEffect(() => {
@@ -33,11 +29,21 @@ export function CountryDropdown({ value, onChange, required }) {
   }, []);
 
   const handleSelect = (country) => {
-    onChange(`${country.flag} ${country.name}`);
+    onChange(`${country.flag} ${country.code}`);
     setIsOpen(false);
   };
 
-  const selectedCountry = countries.find(country => country.name === value || `${country.flag} ${country.name}` === value);
+  // Safe parsing of the value string
+  const getSelectedCountryCode = () => {
+    if (!value || typeof value !== 'string') return null;
+    const parts = value.split(' ');
+    return parts.length > 1 ? parts[1] : null;
+  };
+
+  const selectedCountry = countries.find(country => {
+    const selectedCode = getSelectedCountryCode();
+    return selectedCode && country.code === selectedCode;
+  });
 
   return (
     <DropdownContainer ref={dropdownRef}>
@@ -63,7 +69,7 @@ export function CountryDropdown({ value, onChange, required }) {
             <DropdownItem
               key={country.code}
               onClick={() => handleSelect(country)}
-              selected={country.name === value}
+              selected={getSelectedCountryCode() === country.code}
             >
               <span>{country.flag}</span>
               <span>{country.name}</span>

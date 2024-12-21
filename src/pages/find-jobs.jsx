@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { styled } from 'styled-components'
 import '../index.css'
 import { NavigationBar } from '../components/navbar.jsx'
@@ -9,51 +9,150 @@ import { ThemeProvider } from 'styled-components';
 import { lightTheme, darkTheme } from '../utils/theme.js';
 import { useContext } from 'react'
 import { Context } from '../App.jsx'
+import { fetchJobs } from '../utils/job-requests.js'
+import { FourSquare } from "react-loading-indicators";
 
-export function FindJobs(){
-    const [isDarkMode, setIsDarkMode,profile] = useContext(Context);
-    const jobs = [
-        {
-            title: "Create web blog about Design with Django framework",
-            postedTime: "Posted yesterday",
-            jobType: "Fixed-price",
-            experienceLevel: "Entry level",
-            budget: "$20",
-            description: "Need to quickly create a web app for a design blog",
-            tags: ["PostgreSQL", "Web Development", "HTML", "CSS", "Django"],
-            paymentVerified: "✓ Payment verified",
-            spent: "$0 spent",
-            location: "🌍 KAZ",
-            proposals: "Proposals: 10 to 15"
-        },
-        {
-            title: "Create web blog about Design with Django framework",
-            postedTime: "Posted yesterday",
-            jobType: "Fixed-price",
-            experienceLevel: "Entry level",
-            budget: "$20",
-            description: "Need to quickly create a web app for a design blog",
-            tags: ["PostgreSQL", "Web Development", "HTML", "CSS", "Django"],
-            paymentVerified: "✓ Payment verified",
-            spent: "$0 spent",
-            location: "🌍 KAZ",
-            proposals: "Proposals: 10 to 15"
-        },
-        {
-            title: "Create web blog about Design with Django framework",
-            postedTime: "Posted yesterday",
-            jobType: "Fixed-price",
-            experienceLevel: "Entry level",
-            budget: "$20",
-            description: "Need to quickly create a web app for a design blog",
-            tags: ["PostgreSQL", "Web Development", "HTML", "CSS", "Django"],
-            paymentVerified: "✓ Payment verified",
-            spent: "$0 spent",
-            location: "🌍 KAZ",
-            proposals: "Proposals: 10 to 15"
-        },
-        // Add more job objects here as needed
+export default function FindJobs(){
+    const [isDarkMode, setIsDarkMode, profile] = useContext(Context);
+    const [filters, setFilters] = useState({
+        category: '',
+        experienceLevel: '',
+        jobType: [],
+        skills: [],
+        priceRange: {
+            hourly: { min: '', max: '' },
+            fixed: { min: '', max: '' }
+        }
+    });
+    const [showAllSkills, setShowAllSkills] = useState(false);
+    const [jobs, setJobs] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [searchParams, setSearchParams] = useState({
+        query: '',
+        countryCode: 'ALL'
+    });
+
+    const professionLevelOptions = [
+        'Entry',
+        'Intermediate', 
+        'Senior',
+        'Lead',
+        'Expert'
     ];
+
+    const initialVisibleSkills = [
+        'Python',
+        'TypeScript',
+        'JavaScript',
+        'React',
+        'Node.js',
+    ];
+
+    const additionalSkills = [
+        'PHP',
+        'Ruby',
+        'Swift',
+        'Go',
+        'Rust',
+        'SQL',
+        'MongoDB',
+        'AWS',
+        'Docker',
+        'Kubernetes'
+    ];
+
+    const visibleSkills = showAllSkills 
+        ? [...initialVisibleSkills, ...additionalSkills]
+        : initialVisibleSkills;
+
+    const handleCategoryChange = (e) => {
+        setFilters({ ...filters, category: e.target.value });
+    };
+
+    const handleExperienceChange = (level) => {
+        setFilters(prev => ({
+            ...prev,
+            experienceLevel: prev.experienceLevel === level ? '' : level
+        }));
+    };
+
+    const handleJobTypeChange = (type) => {
+        if (filters.jobType.includes(type)) {
+            setFilters({
+                ...filters,
+                jobType: filters.jobType.filter(t => t !== type)
+            });
+        } else {
+            setFilters({
+                ...filters,
+                jobType: [...filters.jobType, type]
+            });
+        }
+    };
+
+    const handlePriceRangeChange = (type, field, value) => {
+        setFilters({
+            ...filters,
+            priceRange: {
+                ...filters.priceRange,
+                [type]: {
+                    ...filters.priceRange[type],
+                    [field]: value
+                }
+            }
+        });
+    };
+
+    const handleSkillChange = (skill) => {
+        setFilters(prev => {
+            if (prev.skills.includes(skill)) {
+                return {
+                    ...prev,
+                    skills: prev.skills.filter(s => s !== skill)
+                };
+            }
+            return {
+                ...prev,
+                skills: [...prev.skills, skill]
+            };
+        });
+    };
+
+    const applyFilters = () => {
+        console.log('Applying filters:', filters);
+    };
+
+    const loadJobs = async () => {
+        setLoading(true);
+        try {
+            const requestData = {
+                query: searchParams.query,
+                filters: filters,
+                countryCode: searchParams.countryCode
+            };
+            
+            const response = await fetchJobs(requestData);
+            if (response.success) {
+                setJobs(response.message || []);
+            }
+        } catch (error) {
+            console.error('Error fetching jobs:', error);
+        }
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        loadJobs();
+    }, [filters, searchParams]); 
+
+    useEffect(() => {
+        
+        const params = new URLSearchParams(window.location.search);
+        setSearchParams({
+            query: params.get('query') || '',
+            countryCode: params.get('country') || 'ALL'
+        });
+    }, []);
 
     return (
         <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}> 
@@ -70,94 +169,99 @@ export function FindJobs(){
                     <FiltersContainer>
                         <FilterSection>
                             <FilterTitle>Category</FilterTitle>
-                            <Select>
-                                <option>Select Categories</option>
-                                {/* Add more options here */}
+                            <Select value={filters.category} onChange={handleCategoryChange}>
+                                <option value="">Select Categories</option>
+                                <option value="technology">Technology</option>
                             </Select>
                         </FilterSection>
                         <FilterSection>
                             <FilterTitle>Experience level</FilterTitle>
-                            <Checkbox>
-                                <input type="checkbox" />
-                                Entry Level (44)
-                            </Checkbox>
-                            <Checkbox>
-                                <input type="checkbox" />
-                                Intermediate (429)
-                            </Checkbox>
-                            <Checkbox>
-                                <input type="checkbox" />
-                                Expert (243)
-                            </Checkbox>
+                            {professionLevelOptions.map(level => (
+                                <CheckboxLabel key={level}>
+                                    <CheckboxInput 
+                                        type="checkbox"
+                                        checked={filters.experienceLevel === level}
+                                        onChange={() => handleExperienceChange(level)}
+                                    />
+                                    <CheckboxText>{level}</CheckboxText>
+                                </CheckboxLabel>
+                            ))}
+                        </FilterSection>
+                        <FilterSection>
+                            <FilterHeader>
+                                <FilterTitle>Skills</FilterTitle>
+                                <ExpandIcon onClick={() => setShowAllSkills(!showAllSkills)}>
+                                    {showAllSkills ? '▼' : '▲'}
+                                </ExpandIcon>
+                            </FilterHeader>
+                            <SkillsList>
+                                {visibleSkills.map(skill => (
+                                    <SkillCheckboxLabel key={skill}>
+                                        <CheckboxInput
+                                            type="checkbox"
+                                            checked={filters.skills.includes(skill)}
+                                            onChange={() => handleSkillChange(skill)}
+                                        />
+                                        <CheckboxText>{skill}</CheckboxText>
+                                    </SkillCheckboxLabel>
+                                ))}
+                                <SeeMoreButton 
+                                    onClick={() => setShowAllSkills(!showAllSkills)}
+                                >
+                                    {showAllSkills ? '▲ See less' : '▼ See more'}
+                                </SeeMoreButton>
+                            </SkillsList>
                         </FilterSection>
                         <FilterSection>
                             <FilterTitle>Job type</FilterTitle>
-                            <Checkbox>
-                                <input type="checkbox" />
-                                Hourly (444)
-                            </Checkbox>
-                            <PriceInput>
-                                <input type="text" placeholder="$ Min" />
-                                <span>/ hr</span>
-                                <input type="text" placeholder="$ Max" />
-                            </PriceInput>
-                            <Checkbox>
-                                <input type="checkbox" />
-                                Fixed-Price (272)
-                            </Checkbox>
-                            <Checkbox>
-                                <input type="checkbox" />
-                                Less than $100 (87)
-                            </Checkbox>
-                            <Checkbox>
-                                <input type="checkbox" />
-                                $100 to $500 (82)
-                            </Checkbox>
-                            <Checkbox>
-                                <input type="checkbox" />
-                                $500 - $1K (27)
-                            </Checkbox>
-                            <Checkbox>
-                                <input type="checkbox" />
-                                $1K - $5K (59)
-                            </Checkbox>
-                            <Checkbox>
-                                <input type="checkbox" />
-                                $5K+ (17)
-                            </Checkbox>
-                            <PriceInput>
-                                <input type="text" placeholder="$ Min" />
-                                <input type="text" placeholder="$ Max" />
-                            </PriceInput>
+                            <CheckboxLabel>
+                                <CheckboxInput 
+                                    type="checkbox"
+                                    checked={filters.jobType.includes('hourly')}
+                                    onChange={() => handleJobTypeChange('hourly')}
+                                />
+                                <CheckboxText>Hourly</CheckboxText>
+                            </CheckboxLabel>
+                            {filters.jobType.includes('hourly') && (
+                                <PriceInput>
+                                    <input 
+                                        type="number" 
+                                        placeholder="$ Min"
+                                        value={filters.priceRange.hourly.min}
+                                        onChange={(e) => handlePriceRangeChange('hourly', 'min', e.target.value)}
+                                    />
+                                    <span>/ hr</span>
+                                    <input 
+                                        type="number" 
+                                        placeholder="$ Max"
+                                        value={filters.priceRange.hourly.max}
+                                        onChange={(e) => handlePriceRangeChange('hourly', 'max', e.target.value)}
+                                    />
+                                </PriceInput>
+                            )}
+                            <CheckboxLabel>
+                                <CheckboxInput 
+                                    type="checkbox"
+                                    checked={filters.jobType.includes('fixed')}
+                                    onChange={() => handleJobTypeChange('fixed')}
+                                />
+                                <CheckboxText>Fixed-Price</CheckboxText>
+                            </CheckboxLabel>
                         </FilterSection>
+                       
                     </FiltersContainer>
                     <JobsList>
-                        {jobs.map((job, index) => (
-                            <JobCard onClick={()=>{window.location.href = "details"}} key={index}>
-                                <JobHeader>
-                                    <PostedTime>{job.postedTime}</PostedTime>
-                                    <div>
-                                        <span>❤️</span>
-                                    </div>
-                                </JobHeader>
-                                <JobTitle>{job.title}</JobTitle>
-                                <JobDetails>
-                                    <span>{job.jobType}</span>
-                                    <span>{job.experienceLevel}</span>
-                                    <span>Est. Budget: {job.budget}</span>
-                                </JobDetails>
-                                <p>{job.description}</p>
-                                <Tags>
-                                    {job.tags.map(tag => <Tag key={tag}>{tag}</Tag>)}
-                                </Tags>
-                                <JobDetails>
-                                    <span>{job.paymentVerified}</span>
-                                    <span>{job.spent}</span>
-                                    <span>{job.location}</span>
-                                    <span>{job.proposals}</span>
-                                </JobDetails>
-                            </JobCard>
-                        ))}
+                        {loading ? (
+                            <LoaderContainer>
+                                <FourSquare color="#0B65C6" size="medium" text="" textColor="" />
+                            </LoaderContainer>
+                        ) : jobs.length > 0 ? (
+                            jobs.map((job, index) => (
+                                <JobCard key={index} {...job} />
+                            ))
+                        ) : (
+                            <NoJobsMessage>No jobs found matching your criteria</NoJobsMessage>
+                        )}
                     </JobsList>
                 </Jobs>
                 
@@ -356,4 +460,144 @@ const PriceInput = styled.div`
         margin-right: 5px;
         color: #666;
     }
+`;
+
+const ApplyButton = styled.button`
+    background-color: #147df5;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 20px;
+    
+    &:hover {
+        background-color: #0e63c7;
+    }
+`;
+
+const CheckboxLabel = styled.label`
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    cursor: pointer;
+`;
+
+const CheckboxInput = styled.input`
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid ${({theme}) => theme.weakBorderColor};
+    border-radius: 3px;
+    margin-right: 8px;
+    cursor: pointer;
+    position: relative;
+    background-color: ${({theme}) => theme.background};
+
+    &:checked {
+        background-color: #0A65CC;
+        border-color: #0A65CC;
+    }
+
+    &:checked::after {
+        content: '✓';
+        position: absolute;
+        color: white;
+        font-size: 14px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+`;
+
+const CheckboxText = styled.span`
+    color: ${({theme}) => theme.color};
+    font-size: 14px;
+`;
+
+const FilterHeader = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+`;
+
+const ExpandIcon = styled.span`
+    cursor: pointer;
+    color: ${({theme}) => theme.color};
+    font-size: 12px;
+`;
+
+const SkillsList = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+`;
+
+const SkillCheckboxLabel = styled.label`
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 2px 0;
+`;
+
+const SeeMoreButton = styled.button`
+    background: none;
+    border: none;
+    color: #0A65CC;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 5px 0;
+    margin-top: 5px;
+    text-align: left;
+
+    &:hover {
+        text-decoration: underline;
+    }
+`;
+
+const RadioLabel = styled(CheckboxLabel)`
+    &:hover {
+        background-color: ${({theme}) => theme.secBackground};
+    }
+`;
+
+const RadioInput = styled(CheckboxInput)`
+    border-radius: 50%;
+
+    &:checked::after {
+        content: '';
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: white;
+        border-radius: 50%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+`;
+
+const RadioText = styled(CheckboxText)`
+    font-size: 14px;
+`;
+
+const LoaderContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 65%;
+    width: 100%;
+`;
+
+const LoadingMessage = styled.div`
+    text-align: center;
+    padding: 20px;
+    color: ${({theme}) => theme.color};
+`;
+
+const NoJobsMessage = styled.div`
+    text-align: center;
+    padding: 20px;
+    color: ${({theme}) => theme.secColor};
 `;
