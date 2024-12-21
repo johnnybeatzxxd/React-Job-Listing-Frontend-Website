@@ -37,7 +37,7 @@ const CountryDropdown = ({ onCountrySelect }) => {
         { name: 'France', code: 'FR', flag: '🇫🇷' },
     ];
 
-    // Find initial country based on URL parameter
+  
     const getInitialCountry = () => {
         const params = new URLSearchParams(window.location.search);
         const countryCode = params.get('country') || 'ALL';

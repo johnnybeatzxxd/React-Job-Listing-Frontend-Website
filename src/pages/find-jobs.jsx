@@ -4,13 +4,18 @@ import '../index.css'
 import { NavigationBar } from '../components/navbar.jsx'
 import { SearchInbox } from '../components/search-inbox.jsx'
 import { Location } from '../components/location-dropdown.jsx'
+import FavoriteGrey from '../assets/favorite-grey.svg'
+import Favorite from '../assets/favorite.svg'
 import { FooterBar } from '../components/footer.jsx'
 import { ThemeProvider } from 'styled-components';
 import { lightTheme, darkTheme } from '../utils/theme.js';
 import { useContext } from 'react'
 import { Context } from '../App.jsx'
-import { fetchJobs } from '../utils/job-requests.js'
+import { fetchJobs, toggleJobFavorite } from '../utils/job-requests.js'
 import { FourSquare } from "react-loading-indicators";
+import { getTimeAgo } from '../utils/timeUtils.js';
+import { toast } from 'react-hot-toast';
+
 
 export default function FindJobs(){
     const [isDarkMode, setIsDarkMode, profile] = useContext(Context);
@@ -31,6 +36,7 @@ export default function FindJobs(){
         query: '',
         countryCode: 'ALL'
     });
+    const [favorites, setFavorites] = useState(new Set());
 
     const professionLevelOptions = [
         'Entry',
@@ -133,7 +139,8 @@ export default function FindJobs(){
             
             const response = await fetchJobs(requestData);
             if (response.success) {
-                setJobs(response.message || []);
+                console.log(response.data)
+                setJobs(response.data.jobs || []);
             }
         } catch (error) {
             console.error('Error fetching jobs:', error);
@@ -142,17 +149,68 @@ export default function FindJobs(){
     };
 
     useEffect(() => {
-        loadJobs();
-    }, [filters, searchParams]); 
+        if (searchParams.query || 
+            searchParams.countryCode !== 'ALL' || 
+            Object.values(filters).some(value => 
+                Array.isArray(value) ? value.length > 0 : value !== ''
+            )) {
+            loadJobs();
+        }
+    }, [searchParams.query, searchParams.countryCode, filters]);
 
     useEffect(() => {
-        
         const params = new URLSearchParams(window.location.search);
-        setSearchParams({
-            query: params.get('query') || '',
-            countryCode: params.get('country') || 'ALL'
+        const queryParam = params.get('query');
+        const countryParam = params.get('country');
+        
+        if (queryParam !== searchParams.query || countryParam !== searchParams.countryCode) {
+            setSearchParams({
+                query: queryParam || '',
+                countryCode: countryParam || 'ALL'
+            });
+        }
+    }, [window.location.search, searchParams]);
+
+    const handleFavoriteToggle = async (e, jobId) => {
+        e.stopPropagation();
+        
+        // Optimistically update UI
+        setFavorites(prev => {
+            const newFavorites = new Set(prev);
+            if (newFavorites.has(jobId)) {
+                newFavorites.delete(jobId);
+            } else {
+                newFavorites.add(jobId);
+            }
+            return newFavorites;
         });
-    }, []);
+
+        // Make API call
+        const response = await toggleJobFavorite(jobId);
+        if (!response.success) {
+            // Revert the UI change if the API call failed
+            setFavorites(prev => {
+                const newFavorites = new Set(prev);
+                if (newFavorites.has(jobId)) {
+                    newFavorites.delete(jobId);
+                } else {
+                    newFavorites.add(jobId);
+                }
+                return newFavorites;
+            });
+
+            // Show error toast
+            toast.error(response.message || 'Failed to update favorite');
+        }
+    };
+
+    // Initialize favorites from profile data
+    useEffect(() => {
+        if (profile && profile.favorite_jobs) {
+            // Convert the favorite_jobs array to a Set
+            setFavorites(new Set(profile.favorite_jobs));
+        }
+    }, [profile]); // Only run when profile changes
 
     return (
         <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}> 
@@ -257,7 +315,46 @@ export default function FindJobs(){
                             </LoaderContainer>
                         ) : jobs.length > 0 ? (
                             jobs.map((job, index) => (
-                                <JobCard key={index} {...job} />
+                                <JobCard onClick={() => {window.location.href = "details"}} key={job.id}>
+                                    <JobHeader>
+                                        <span>Posted {getTimeAgo(job.created_at)}</span>
+                                        <FavoriteIcon 
+                                            onClick={(e) => handleFavoriteToggle(e, job.id)}
+                                        >
+                                            <img 
+                                                src={favorites.has(job.id) ? Favorite : FavoriteGrey} 
+                                                alt="favorite" 
+                                                style={{ width: '24px', height: '24px' }}
+                                            />
+                                        </FavoriteIcon>
+                                    </JobHeader>
+                                    <JobTitle>{job.jobTitle}</JobTitle>
+                                    <JobDetails>
+                                        <span>{job.jobType.charAt(0).toUpperCase() + job.jobType.slice(1) || 'Fixed-price'}</span>
+                                        <span>{job.level.charAt(0).toUpperCase() + job.level.slice(1) || 'Intermediate'}</span>
+                                        <span>
+                                            -{job.salaryType === 'hourly' 
+                                                ? `$${job.salary}/hr`
+                                                : `Est. Budget: $${job.estimatedBudget ? job.estimatedBudget.charAt(0).toUpperCase() + job.estimatedBudget.slice(1) : '50'}`
+                                            }
+                                        </span>
+                                    </JobDetails>
+                                    <JobDescription>{job.description.length > 250 
+                                        ? `${job.description.substring(0, 250)}...` 
+                                        : job.description}
+                                    </JobDescription>
+                                    <Tags>
+                                        {(job.tags || ['Python', 'Web Development']).map(tag => 
+                                            <Tag key={tag}>{tag}</Tag>
+                                        )}
+                                    </Tags>
+                                    <JobDetails>
+                                        <span>✓ Payment verified</span>
+                                        <span>⭐ $100+ spent</span>
+                                        <span>📍 {job.country || 'United States'}</span>
+                                        <span>Proposals: {job.proposals || '5 to 10'}</span>
+                                    </JobDetails>
+                                </JobCard>
                             ))
                         ) : (
                             <NoJobsMessage>No jobs found matching your criteria</NoJobsMessage>
@@ -359,17 +456,17 @@ const JobsList = styled.div`
     gap: 10px;
 `
 const JobCard = styled.div`
-    background-color:  ${({theme})=>theme.background};
-    border: 1px solid  ${({theme})=>theme.weakBorderColor};
-    padding: 20px;
+    background-color: ${({theme}) => theme.background};
+    padding: 24px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    transition: background-color 0.3s;
+    gap: 12px;
     cursor: pointer;
+    border-bottom: 1px solid ${({theme}) => theme.weakBorderColor};
+    border-top: 1px solid ${({theme}) => theme.weakBorderColor};
 
     &:hover {
-        background-color:  ${({theme})=>theme.secBackground}; // Change color on hover
+        background-color: ${({theme}) => theme.secBackground};
     }
 `
 
@@ -377,38 +474,36 @@ const JobHeader = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-`
-
-const PostedTime = styled.span`
-    color: #666;
-    font-size: 0.9rem;
+    color: #6B7177;
+    font-size: 14px;
 `
 
 const JobTitle = styled.h3`
-    font-size: 1.1rem;
-    color: #147df5;
+    font-size: 21px;
+    color: #237fe9;
     margin: 0;
+    font-weight: 500;
 `
 
 const JobDetails = styled.div`
     display: flex;
     gap: 15px;
-    color: #666;
-    font-size: 0.9rem;
+    color: #6B7177;
+    font-size: 14px;
 `
 
 const Tags = styled.div`
     display: flex;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
 `
 
 const Tag = styled.span`
-    background-color:  ${({theme})=>theme.iconWrapper};
-    padding: 5px 10px;
-    border-radius: 15px;
-    font-size: 0.85rem;
-    color:  ${({theme})=>theme.secColor};
+    background-color: ${({theme})=>theme.secBackground};
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    color: ${({theme})=>theme.secColor};
 `
 
 const FilterSection = styled.div`
@@ -601,3 +696,27 @@ const NoJobsMessage = styled.div`
     padding: 20px;
     color: ${({theme}) => theme.secColor};
 `;
+
+const JobDescription = styled.p`
+    margin: 0;
+    line-height: 1.5;
+    color: ${({theme}) => theme.secColor};
+    font-size: 14px;
+`;
+
+const FavoriteIcon = styled.button`
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+
+    &:hover {
+        transform: scale(1.1);
+    }
+`;
+
+

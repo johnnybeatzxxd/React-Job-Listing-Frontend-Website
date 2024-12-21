@@ -44,18 +44,25 @@ export function postJob(formData) {
 }
 
 export const fetchJobs = async (requestData) => {
+    const config = createRequestConfig(`${backend_url}/api/jobs/search`, JSON.stringify(requestData));
+
     try {
-        const response = await fetch('/api/jobs', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestData)
-        });
-        return await response.json();
+        const response = await axios.request(config);
+        return { success: true, data: response.data };
     } catch (error) {
         console.error('Error in fetchJobs:', error);
-        throw error;
+        return { success: false, message: error.response.data.error || 'An error occurred' };
     }
 };
 
+export const toggleJobFavorite = async (jobId) => {
+    const config = createRequestConfig(`${backend_url}/api/jobs/save`, JSON.stringify({ jobId }));
+    
+    try {
+        const response = await axios.request(config);
+        return { success: true, data: response.data };
+    } catch (error) {
+        console.error('Error toggling job favorite:', error);
+        return { success: false, message: error.response?.data?.error || 'An error occurred' };
+    }
+};
