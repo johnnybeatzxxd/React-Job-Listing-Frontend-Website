@@ -5,9 +5,6 @@ axios.defaults.withCredentials = true;
 const backend_url = import.meta.env.VITE_BACKEND_URL;
 
 
-
-
-
 function createRequestConfig(url, data, method = 'post') {
     const csrftoken = localStorage.getItem('csrfToken');
     const isFormData = data instanceof FormData;
@@ -46,15 +43,19 @@ export function postJob(formData) {
         });
 }
 
-export function getJob() {
-
-    const config = createRequestConfig(`${backend_url}/api/jobs`,null,'get');
-    return axios.request(config)
-        .then((response) => {
-            return { success: true, message: response.data.profile };
-        })
-        .catch((error) => {
-            console.log(error);
-            return { success: false, message: error.response.data.error || 'An error occurred',user: error.response.data.user };
+export const fetchJobs = async (requestData) => {
+    try {
+        const response = await fetch('/api/jobs', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestData)
         });
-}
+        return await response.json();
+    } catch (error) {
+        console.error('Error in fetchJobs:', error);
+        throw error;
+    }
+};
+
