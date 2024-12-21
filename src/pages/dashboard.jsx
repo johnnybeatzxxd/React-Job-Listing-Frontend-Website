@@ -220,9 +220,11 @@ const Content = styled.div`
 const SideBar = styled.div`
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: calc(100vh - 100px);
     width: 25%;
     padding: 20px 0px 20px 0;
+    position: sticky;
+    top: 0;
 
     @media (max-width: 1024px) {
         width: 30%;
@@ -232,6 +234,8 @@ const SideBar = styled.div`
         width: 100%;
         padding: 10px 0;
         margin-bottom: 20px;
+        height: auto;
+        position: static;
     }
 `
 
@@ -264,14 +268,18 @@ const SideBarItem = styled.div`
     }
 `
 const LogoutItem = styled(SideBarItem)`
-    margin-top: auto;
+    margin-top: auto !important;
+    position: sticky;
+    bottom: 0;
+    background-color: ${({theme})=>theme.background};
     
     &:hover {
         border-left: 3px solid red;
     }
 
     @media (max-width: 768px) {
-        margin-top: 20px;
+        position: static;
+        margin-top: 20px !important;
     }
 `
 

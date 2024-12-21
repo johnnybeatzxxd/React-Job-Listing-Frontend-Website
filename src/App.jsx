@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route } from "react-router";
 import { HomePage } from './pages/home';
-import { FindJobs } from './pages/find-jobs';
+import FindJobs from './pages/find-jobs';
 import { JobDetails } from './pages/job-details';
 import { DashboardPage } from './pages/dashboard';
 import { SignupPage } from './pages/signup';

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { styled } from 'styled-components'
 import '../index.css'
 import LogoImage from '../assets/Logo.svg'
@@ -8,15 +8,85 @@ import MoonIcon from '../assets/moon.svg'
 import SunIcon from '../assets/sun.svg'
 import { ThemeProvider } from 'styled-components';
 import { lightTheme, darkTheme } from '../utils/theme.js';
-import { useContext } from 'react'
 import { Context } from '../App.jsx'
+import { Location } from './location-dropdown.jsx'
 
 
 export function NavigationBar(){
-    const [isDarkMode, setIsDarkMode,profile] = useContext(Context);
+    const getInitialValues = () => {
+        const params = new URLSearchParams(window.location.search);
+        return {
+            query: params.get('query') || '',
+            country: params.get('country') || 'ALL'
+        };
+    };
+
+    const [isDarkMode, setIsDarkMode, profile] = useContext(Context);
+    const [searchQuery, setSearchQuery] = useState(getInitialValues().query);
+    const [selectedCountry, setSelectedCountry] = useState({ 
+        code: getInitialValues().country,
+        name: getInitialValues().country === 'ALL' ? 'All Countries' : getInitialValues().country,
+        flag: getInitialValues().country === 'ALL' ? '🌍' : ''
+    });
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
+  
+    const [isInitialMount, setIsInitialMount] = useState(true);
+
+    useEffect(() => {
+        const countries = [
+            { name: 'All Countries', code: 'ALL', flag: '🌍' },
+            { name: 'United States', code: 'US', flag: '🇺🇸' },
+            { name: 'Canada', code: 'CA', flag: '🇨🇦' },
+            { name: 'United Kingdom', code: 'GB', flag: '🇬🇧' },
+        ];
+
+        const countryCode = getInitialValues().country;
+        const foundCountry = countries.find(c => c.code === countryCode) || countries[0];
+        setSelectedCountry(foundCountry);
+    }, []);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 2000);
+
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    useEffect(() => {
+        if (isInitialMount) {
+            setIsInitialMount(false);
+            return;
+        }
+
+        if (debouncedSearchQuery !== '') {
+            handleSearch();
+        }
+    }, [debouncedSearchQuery]);
+
+    const handleSearch = () => {
+        const currentParams = new URLSearchParams(window.location.search);
+        const currentQuery = currentParams.get('query');
+        const currentCountry = currentParams.get('country');
+
+        if (currentQuery === searchQuery && currentCountry === selectedCountry.code) {
+            return;
+        }
+
+        const countryParam = selectedCountry.code;
+        const queryParam = encodeURIComponent(searchQuery);
+        window.location.href = `find-jobs?country=${countryParam}&query=${queryParam}`;
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
+
     const toggleTheme = () => {
-        setIsDarkMode((prevMode) => !prevMode);
-      };
+        setIsDarkMode(prevMode => !prevMode);
+    };
 
     return (   
         <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>     
@@ -33,9 +103,14 @@ export function NavigationBar(){
                     <Logo onClick={()=>{window.location.href = "/"}} src={isDarkMode ? LogoDark :LogoImage} alt="Logo" />
                     <SearchWrapper>
                         <Search>
-                            <CountryDropdown />
-                            <SLogo src={SearchLogo} alt="Logo" />
-                            <SearchInput placeholder='Job title, keyword, company'/>
+                            <Location onCountrySelect={setSelectedCountry} />
+                            <SLogo onClick={handleSearch} src={SearchLogo} alt="Logo" style={{ cursor: 'pointer' }} />
+                            <SearchInput 
+                                placeholder='Job title, keyword, company'
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onKeyDown={handleKeyPress}
+                            />
                         </Search>
                     </SearchWrapper>
                     <Navbuttons>
@@ -126,6 +201,7 @@ const Logo = styled.img`
 const SearchWrapper = styled.div`
     display: flex;
     justify-content: center;
+    
     flex-grow: 1;
 `
 const Search = styled.div`
@@ -133,6 +209,7 @@ const Search = styled.div`
     flex-direction: row;
     align-items: center;
     margin-left: 10px;
+    padding-left: 10px;
     width: 100%;
     height: 40px;
     border: 1px solid ${({ theme }) => theme.weakBorderColor};
@@ -144,7 +221,6 @@ const Search = styled.div`
     }
 `
 const Dropdown = styled.select`
-    // make the text on the center
     text-align: center;
     border-radius: 5px;
     outline: none;
