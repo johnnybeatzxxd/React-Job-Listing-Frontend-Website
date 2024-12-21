@@ -23,7 +23,13 @@ import { Context } from '../App.jsx'
 
 export function HomePage(){
     const [isDarkMode, profile] = useContext(Context);
-    
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedCountry, setSelectedCountry] = useState({ code: 'ALL', name: 'All Countries', flag: '🌍' });
+
+    const handleSearch = () => {
+        window.location.href = `find-jobs?country=${selectedCountry.code}&query=${encodeURIComponent(searchQuery)}`;
+    };
+
     const categoriesData = [
         { title: "Graphics & Design", positions: "357 Open position", icon: <img src={Graphics} alt="Graphics & Design Icon" /> },
         { title: "Code & Programming", positions: "312 Open position", icon: <img src={Coding} alt="Code & Programming Icon" /> },
@@ -47,9 +53,9 @@ export function HomePage(){
                         <Text>Find a job that suits your interest & skills. </Text>
                         <SubText>True strength lies in grace, navigating challenges with poise and embracing opportunities with wisdom.</SubText>
                         <SearchBox>
-                            <SearchInbox></SearchInbox>
-                            <Location></Location>
-                            <FindButton>Find Jobs</FindButton>
+                            <SearchInbox onSearchChange={setSearchQuery} />
+                            <Location onCountrySelect={setSelectedCountry} />
+                            <FindButton onClick={handleSearch}>Find Jobs</FindButton>
                         </SearchBox>
                         <SubTexts>
                             <SubText style={{fontSize:"0.8rem"}}>Suggestion: </SubText>
@@ -99,7 +105,6 @@ export function HomePage(){
 const Home = styled.div`
     height: 100vh;
     width: 100vw;
-    //overflow-x: hidden;
 `
 const HomeHeader = styled.div`
     display: flex;
@@ -167,7 +172,6 @@ const Text = styled.h1`
 `
 const SubText = styled.h1`
     display: flex;
-    //padding-top: 14px;
     padding-bottom: 15px;
     font-family: "Inter Tight", sans-serif;
     font-optical-sizing: auto;
@@ -196,21 +200,26 @@ const SearchBox = styled.div`
     }
 ` 
 const FindButton = styled.button`
-    background-color:#0A65CC;
+    background-color: #0A65CC;
     border: 1px solid #0A65CC;
     border-radius: 3px;
     color: white;
     margin-left: auto;
     height: 80%;
-    justify-self:end;
+    justify-self: end;
     padding: 0 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+        background-color: #0850a0;
+    }
 
     @media (max-width: 768px) {
         width: 100%;
         margin: 10px 0;
         height: 40px;
     }
-    
 `
 const Image = styled.div`
     display: flex;
