@@ -22,7 +22,7 @@ export default function FindJobs(){
     const [filters, setFilters] = useState({
         category: '',
         experienceLevel: '',
-        jobType: [],
+        jobType: '',
         skills: [],
         priceRange: {
             hourly: { min: '', max: '' },
@@ -83,17 +83,27 @@ export default function FindJobs(){
     };
 
     const handleJobTypeChange = (type) => {
-        if (filters.jobType.includes(type)) {
-            setFilters({
-                ...filters,
-                jobType: filters.jobType.filter(t => t !== type)
-            });
-        } else {
-            setFilters({
-                ...filters,
-                jobType: [...filters.jobType, type]
-            });
-        }
+        setFilters(prev => {
+            if (prev.jobType === type) {
+                return {
+                    ...prev,
+                    jobType: '',
+                    priceRange: {
+                        ...prev.priceRange,
+                        [type]: { min: '', max: '' }
+                    }
+                };
+            }
+            
+            return {
+                ...prev,
+                jobType: type,
+                priceRange: {
+                    hourly: { min: '', max: '' },
+                    fixed: { min: '', max: '' }
+                }
+            };
+        });
     };
 
     const handlePriceRangeChange = (type, field, value) => {
@@ -149,32 +159,31 @@ export default function FindJobs(){
     };
 
     useEffect(() => {
-        if (searchParams.query || 
-            searchParams.countryCode !== 'ALL' || 
-            Object.values(filters).some(value => 
-                Array.isArray(value) ? value.length > 0 : value !== ''
-            )) {
-            loadJobs();
-        }
+        loadJobs();
     }, [searchParams.query, searchParams.countryCode, filters]);
 
     useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const queryParam = params.get('query');
-        const countryParam = params.get('country');
-        
-        if (queryParam !== searchParams.query || countryParam !== searchParams.countryCode) {
+        const handleUrlChange = () => {
+            const params = new URLSearchParams(window.location.search);
+            const queryParam = params.get('query');
+            const countryParam = params.get('country');
+            
             setSearchParams({
                 query: queryParam || '',
                 countryCode: countryParam || 'ALL'
             });
-        }
-    }, [window.location.search, searchParams]);
+        };
+        window.addEventListener('popstate', handleUrlChange);
+        window.addEventListener('urlchange', handleUrlChange);
+        handleUrlChange();
+        return () => {
+            window.removeEventListener('popstate', handleUrlChange);
+            window.removeEventListener('urlchange', handleUrlChange);
+        };
+    }, []);
 
     const handleFavoriteToggle = async (e, jobId) => {
         e.stopPropagation();
-        
-        // Optimistically update UI
         setFavorites(prev => {
             const newFavorites = new Set(prev);
             if (newFavorites.has(jobId)) {
@@ -185,10 +194,8 @@ export default function FindJobs(){
             return newFavorites;
         });
 
-        // Make API call
         const response = await toggleJobFavorite(jobId);
         if (!response.success) {
-            // Revert the UI change if the API call failed
             setFavorites(prev => {
                 const newFavorites = new Set(prev);
                 if (newFavorites.has(jobId)) {
@@ -198,19 +205,16 @@ export default function FindJobs(){
                 }
                 return newFavorites;
             });
-
-            // Show error toast
-            toast.error(response.message || 'Failed to update favorite');
+            toast.error('Login required.');
         }
     };
 
-    // Initialize favorites from profile data
+
     useEffect(() => {
         if (profile && profile.favorite_jobs) {
-            // Convert the favorite_jobs array to a Set
             setFavorites(new Set(profile.favorite_jobs));
         }
-    }, [profile]); // Only run when profile changes
+    }, [profile]);
 
     return (
         <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}> 
@@ -275,12 +279,12 @@ export default function FindJobs(){
                             <CheckboxLabel>
                                 <CheckboxInput 
                                     type="checkbox"
-                                    checked={filters.jobType.includes('hourly')}
+                                    checked={filters.jobType === 'hourly'}
                                     onChange={() => handleJobTypeChange('hourly')}
                                 />
                                 <CheckboxText>Hourly</CheckboxText>
                             </CheckboxLabel>
-                            {filters.jobType.includes('hourly') && (
+                            {filters.jobType === 'hourly' && (
                                 <PriceInput>
                                     <input 
                                         type="number" 
@@ -300,11 +304,28 @@ export default function FindJobs(){
                             <CheckboxLabel>
                                 <CheckboxInput 
                                     type="checkbox"
-                                    checked={filters.jobType.includes('fixed')}
+                                    checked={filters.jobType === 'fixed'}
                                     onChange={() => handleJobTypeChange('fixed')}
                                 />
                                 <CheckboxText>Fixed-Price</CheckboxText>
                             </CheckboxLabel>
+                            {filters.jobType === 'fixed' && (
+                                <PriceInput>
+                                    <input 
+                                        type="number" 
+                                        placeholder="$ Min"
+                                        value={filters.priceRange.fixed.min}
+                                        onChange={(e) => handlePriceRangeChange('fixed', 'min', e.target.value)}
+                                    />
+                                    <span>-</span>
+                                    <input 
+                                        type="number" 
+                                        placeholder="$ Max"
+                                        value={filters.priceRange.fixed.max}
+                                        onChange={(e) => handlePriceRangeChange('fixed', 'max', e.target.value)}
+                                    />
+                                </PriceInput>
+                            )}
                         </FilterSection>
                        
                     </FiltersContainer>
@@ -315,7 +336,12 @@ export default function FindJobs(){
                             </LoaderContainer>
                         ) : jobs.length > 0 ? (
                             jobs.map((job, index) => (
-                                <JobCard onClick={() => {window.location.href = "details"}} key={job.id}>
+                                <JobCard 
+                                    onClick={() => {
+                                        window.location.href = `/details?jobId=${job.id}`;
+                                    }} 
+                                    key={job.id}
+                                >
                                     <JobHeader>
                                         <span>Posted {getTimeAgo(job.created_at)}</span>
                                         <FavoriteIcon 

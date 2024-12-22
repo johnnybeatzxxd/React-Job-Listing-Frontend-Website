@@ -28,11 +28,18 @@ export function NavigationBar(){
         name: getInitialValues().country === 'ALL' ? 'All Countries' : getInitialValues().country,
         flag: getInitialValues().country === 'ALL' ? '🌍' : ''
     });
-    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
   
     const [isInitialMount, setIsInitialMount] = useState(true);
 
     useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const queryParam = params.get('query') || '';
+        const countryParam = params.get('country') || 'ALL';
+
+        if (queryParam !== searchQuery) {
+            setSearchQuery(queryParam);
+        }
+
         const countries = [
             { name: 'All Countries', code: 'ALL', flag: '🌍' },
             { name: 'United States', code: 'US', flag: '🇺🇸' },
@@ -40,29 +47,11 @@ export function NavigationBar(){
             { name: 'United Kingdom', code: 'GB', flag: '🇬🇧' },
         ];
 
-        const countryCode = getInitialValues().country;
-        const foundCountry = countries.find(c => c.code === countryCode) || countries[0];
-        setSelectedCountry(foundCountry);
-    }, []);
-
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setDebouncedSearchQuery(searchQuery);
-        }, 2000);
-
-        return () => clearTimeout(timer);
-    }, [searchQuery]);
-
-    useEffect(() => {
-        if (isInitialMount) {
-            setIsInitialMount(false);
-            return;
+        const foundCountry = countries.find(c => c.code === countryParam) || countries[0];
+        if (foundCountry.code !== selectedCountry.code) {
+            setSelectedCountry(foundCountry);
         }
-
-        if (debouncedSearchQuery !== '') {
-            handleSearch();
-        }
-    }, [debouncedSearchQuery]);
+    }, [window.location.search]);
 
     const handleSearch = () => {
         const currentParams = new URLSearchParams(window.location.search);
@@ -75,7 +64,11 @@ export function NavigationBar(){
 
         const countryParam = selectedCountry.code;
         const queryParam = encodeURIComponent(searchQuery);
-        window.location.href = `find-jobs?country=${countryParam}&query=${queryParam}`;
+        
+        const newUrl = `find-jobs?country=${countryParam}&query=${queryParam}`;
+        window.history.pushState({}, '', newUrl);
+        
+        window.dispatchEvent(new Event('popstate'));
     };
 
     const handleKeyPress = (e) => {
@@ -86,6 +79,15 @@ export function NavigationBar(){
 
     const toggleTheme = () => {
         setIsDarkMode(prevMode => !prevMode);
+    };
+
+    const handleCountryChange = (newCountry) => {
+        setSelectedCountry(newCountry);
+        
+        const queryParam = encodeURIComponent(searchQuery);
+        const newUrl = `find-jobs?country=${newCountry.code}&query=${queryParam}`;
+        window.history.pushState({}, '', newUrl);
+        window.dispatchEvent(new Event('urlchange'));
     };
 
     return (   
@@ -103,7 +105,10 @@ export function NavigationBar(){
                     <Logo onClick={()=>{window.location.href = "/"}} src={isDarkMode ? LogoDark :LogoImage} alt="Logo" />
                     <SearchWrapper>
                         <Search>
-                            <Location onCountrySelect={setSelectedCountry} />
+                            <Location 
+                                selectedCountry={selectedCountry} 
+                                onCountrySelect={handleCountryChange} 
+                            />
                             <SLogo onClick={handleSearch} src={SearchLogo} alt="Logo" style={{ cursor: 'pointer' }} />
                             <SearchInput 
                                 placeholder='Job title, keyword, company'

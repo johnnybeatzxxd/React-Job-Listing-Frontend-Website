@@ -66,3 +66,15 @@ export const toggleJobFavorite = async (jobId) => {
         return { success: false, message: error.response?.data?.error || 'An error occurred' };
     }
 };
+
+export const getJob = async (requestData) => {
+    const config = createRequestConfig(`${backend_url}/api/jobs/get`, JSON.stringify(requestData));
+
+    try {
+        const response = await axios.request(config);
+        return { success: true, data: response.data };
+    } catch (error) {
+        console.error('Error in fetchJobs:', error);
+        return { success: false, message: error.response.data.error || 'An error occurred' };
+    }
+};
