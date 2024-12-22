@@ -19,7 +19,7 @@ import { lightTheme, darkTheme } from '../utils/theme.js';
 import { useContext } from 'react'
 import { Context } from '../App.jsx'
 
-export function AppliedJobs(){
+export function AppliedJobs({title,data}){
     const [isDarkMode, setIsDarkMode] = useContext(Context);
     return(
         <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}> 

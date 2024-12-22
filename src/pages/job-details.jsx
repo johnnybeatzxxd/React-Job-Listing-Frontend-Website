@@ -148,8 +148,16 @@ export function JobDetails() {
                 <Header>
                     <HeaderContent>
                         <HeaderText>Job Details</HeaderText>
-                        <Path>Home / Find Job / {jobData.tags[0]} / Job Details</Path>
-                    </HeaderContent>
+                        <Path style={{ display: "flex", alignItems: "center" }}>
+                            <span style={{ margin: "0 1px" }}>Home</span>
+                            <span style={{ margin: "0 1px" }}>/</span>
+                            <span style={{ margin: "0 1px" }}>Find Job</span>
+                            <span style={{ margin: "0 1px" }}>/</span>
+                            <span style={{ margin: "0 1px", color: "#0B65C6" }}>{jobData.tags[0]}</span>
+                            <span style={{ margin: "0 1px" }}>/</span>
+                            <span style={{ margin: "0 1px" }}>Job Details</span>
+                        </Path>
+                        </HeaderContent>
                 </Header>
                 <DetailsContainer>
                     <Details>
@@ -347,6 +355,7 @@ const HeaderText = styled.h2`
 const Path = styled.div`
     display: flex;
     font-size: 0.9rem;
+    gap: 5px;
     color: ${({ theme }) => theme.secColor};
     margin-right: 20px;
 `
