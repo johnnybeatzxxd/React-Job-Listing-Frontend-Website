@@ -78,3 +78,23 @@ export const getJob = async (requestData) => {
         return { success: false, message: error.response.data.error || 'An error occurred' };
     }
 };
+
+
+export function applyJob(formData) {
+    const config = createRequestConfig(`${backend_url}/api/jobs/applications/submit`, JSON.stringify(formData));
+
+
+    return axios.request(config)
+        .then((response) => {
+      
+            const csrfToken = response.headers['x-csrftoken'];
+            if (csrfToken) {
+                localStorage.setItem('csrfToken', csrfToken);
+            }
+            console.log(JSON.stringify(response.data));
+            return { success: true, message: response.data.message };
+        })
+        .catch((error) => {
+            return { success: false, message: error.response.data.error || 'An error occurred' };
+        });
+}
