@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { styled } from 'styled-components'
 import '../index.css'
 import { NavigationBar } from './navbar.jsx'
@@ -18,51 +18,95 @@ import { ThemeProvider } from 'styled-components';
 import { lightTheme, darkTheme } from '../utils/theme.js';
 import { useContext } from 'react'
 import { Context } from '../App.jsx'
+import { appliedJobs } from '../utils/dashboard-requests.js'
+import { FourSquare } from "react-loading-indicators";
 
-export function AppliedJobs({title,data}){
+export function AppliedJobs(){
     const [isDarkMode, setIsDarkMode] = useContext(Context);
+    const [appliedJobsData, setAppliedJobsData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        appliedJobs()
+            .then((response) => {
+                if (response.success) {
+                    setAppliedJobsData(response.message);
+                } else {
+                    setError(response.message);
+                }
+                setLoading(false);
+            });
+    }, []);
+
+    if (loading) {
+        return (
+            <LoadingContainer>
+                <FourSquare color="#0B65C6" size="medium" text="" textColor="" />
+            </LoadingContainer>
+        );
+    }
+
+    if (error) {
+        return <ErrorMessage>Error loading applied jobs: {error}</ErrorMessage>;
+    }
+
     return(
         <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}> 
         <Dash>
             <DashContent>
-                 {/* Recently Applied Section */}
-            <RecentlyAppliedSection>
-                <HeaderRow>
-                    <h3>Recently Applied</h3>
-                    
-                </HeaderRow>
-                <JobsTable>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHeaderCell>Job</TableHeaderCell>
-                            <TableHeaderCell>Date Applied</TableHeaderCell>
-                            <TableHeaderCell>Status</TableHeaderCell>
-                            <TableHeaderCell>Action</TableHeaderCell>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        <TableRow>
-                            <TableCell>
-                                <JobInfo>
-                                    <CompanyLogo style={{backgroundColor: '#25C277'}}>Up</CompanyLogo>
-                                    <JobDetails>
-                                        <JobTitle>Networking Engineer</JobTitle>
-                                        <JobMeta>
-                                            <Location>Washington</Location>
-                                            <Salary>$50k-80k/month</Salary>
-                                            <JobType>Remote</JobType>
-                                        </JobMeta>
-                                    </JobDetails>
-                                </JobInfo>
-                            </TableCell>
-                            <TableCell>Feb 2, 2019 19:28</TableCell>
-                            <TableCell><StatusBadge>Active</StatusBadge></TableCell>
-                            <TableCell><ViewDetailsButton>View Details</ViewDetailsButton></TableCell>
-                        </TableRow>
-                        {/* Add more rows as needed */}
-                    </TableBody>
-                </JobsTable>
-            </RecentlyAppliedSection>
+                <RecentlyAppliedSection>
+                    <HeaderRow>
+                        <h3>Applied Jobs</h3>
+                    </HeaderRow>
+                    <JobsTable>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHeaderCell>Job</TableHeaderCell>
+                                <TableHeaderCell>Date Applied</TableHeaderCell>
+                                <TableHeaderCell>Status</TableHeaderCell>
+                                <TableHeaderCell>Action</TableHeaderCell>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {appliedJobsData?.map((job, index) => (
+                                <TableRow key={index}>
+                                    <TableCell>
+                                        <JobInfo>
+                                            <CompanyLogo style={{backgroundColor: '#25C277'}}>
+                                                {job.company_name?.substring(0, 2)}
+                                            </CompanyLogo>
+                                            <JobDetails>
+                                                <JobTitle>{job.company_name}</JobTitle>
+                                                <JobMeta>
+                                                    <Location>{job.country}</Location>
+                                                    <Salary>${job.salary}</Salary>
+                                                    <JobType>{job.job_type}</JobType>
+                                                </JobMeta>
+                                            </JobDetails>
+                                        </JobInfo>
+                                    </TableCell>
+                                    <TableCell>
+                                        {new Date(job.applied_date).toLocaleString()}
+                                    </TableCell>
+                                    <TableCell>
+                                        <StatusBadge>Active</StatusBadge>
+                                    </TableCell>
+                                    <TableCell>
+                                        <ViewDetailsButton>View Details</ViewDetailsButton>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                            {appliedJobsData?.length === 0 && (
+                                <TableRow>
+                                    <TableCell colSpan="4" style={{textAlign: 'center'}}>
+                                        No applied jobs found
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </JobsTable>
+                </RecentlyAppliedSection>
             </DashContent>
         </Dash>
         </ThemeProvider>
@@ -79,6 +123,7 @@ const Dash = styled.div`
 const DashContent = styled.div`
     padding: 20px;
     width: 100%;
+    overflow-x: auto;
 `
 
 const RecentlyAppliedSection = styled.div`
@@ -99,6 +144,7 @@ const HeaderRow = styled.div`
 const JobsTable = styled.table`
     width: 100%;
     border-collapse: collapse;
+    min-width: 650px;
 `
 
 const TableHeader = styled.thead`
@@ -122,12 +168,20 @@ const TableHeaderCell = styled.th`
 
 const TableCell = styled.td`
     padding: 12px;
+
+    @media (max-width: 768px) {
+        padding: 8px;
+    }
 `
 
 const JobInfo = styled.div`
     display: flex;
     align-items: center;
     gap: 12px;
+
+    @media (max-width: 480px) {
+        gap: 8px;
+    }
 `
 
 const CompanyLogo = styled.div`
@@ -139,6 +193,12 @@ const CompanyLogo = styled.div`
     justify-content: center;
     color: white;
     font-weight: bold;
+
+    @media (max-width: 480px) {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9em;
+    }
 `
 
 const JobDetails = styled.div`
@@ -156,6 +216,11 @@ const JobMeta = styled.div`
     gap: 8px;
     color: ${({theme})=>theme.secColor};
     font-size: 0.8em;
+    flex-wrap: wrap;
+
+    @media (max-width: 768px) {
+        gap: 4px;
+    }
 `
 
 const Location = styled.span``
@@ -184,4 +249,23 @@ const ViewDetailsButton = styled.button`
         background-color: ${({theme})=>theme.secBackground};
         border-radius: 4px;
     }
+`
+
+const LoadingContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    padding: 20px;
+
+    @media (max-width: 768px) {
+        padding: 10px;
+    }
+`
+
+const ErrorMessage = styled.div`
+    color: red;
+    text-align: center;
+    padding: 20px;
 `

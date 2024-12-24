@@ -18,38 +18,30 @@ import { ThemeProvider } from 'styled-components';
 import { lightTheme, darkTheme } from '../utils/theme.js';
 import { useContext } from 'react'
 import { Context } from '../App.jsx'
-import { RecruitersOverView } from './overview-recruiters.jsx'
-import { overview } from '../utils/dashboard-requests.js'
+import { favoriteJobs } from '../utils/dashboard-requests.js'
 import { FourSquare } from "react-loading-indicators";
 
 
-export function OverView({setSelectedBar}){
-    const [isDarkMode, setIsDarkMode, profile] = useContext(Context);
-    const [dashboardData, setDashboardData] = useState(null);
+
+
+export function FavoriteJobs(){
+    const [isDarkMode, setIsDarkMode] = useContext(Context);
+    const [favoritesJobsData, setFavoritesJobsData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        overview()
+        favoriteJobs()
             .then((response) => {
                 if (response.success) {
-                    setDashboardData(response.message);
+                    setFavoritesJobsData(response.message);
                 } else {
                     setError(response.message);
                 }
                 setLoading(false);
             });
-    }, [dashboardData]);
+    }, []);
 
-    let firstName = '';
-    try {
-        firstName = profile.full_name.split(" ")[0];
-    } catch {
-        firstName = profile.full_name;
-    }
-
-    if (profile.role === "recruiter") return(<RecruitersOverView setSelectedBar={setSelectedBar}/>)
-    
     if (loading) {
         return (
             <LoadingContainer>
@@ -59,77 +51,62 @@ export function OverView({setSelectedBar}){
     }
 
     if (error) {
-        return <ErrorMessage>Error loading dashboard: {error}</ErrorMessage>;
+        return <ErrorMessage>Error loading Favorite jobs: {error}</ErrorMessage>;
     }
-    console.log("this is the dashboard data: ",dashboardData )
+
     return(
         <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}> 
         <Dash>
             <DashContent>
-                <Greeting>Hello, {firstName}</Greeting>
-                <SubText>Here is your daily activities and job alerts</SubText>
-                
-                <StatsContainer>
-                    <StatBox style={{ backgroundColor: isDarkMode ? '#0c43913c':'#0d67e53b', color: isDarkMode ? '#e8e6e3' : '#18191c'}}>
-                        <StatNumber>{dashboardData?.applied_nums || 0}</StatNumber>
-                        <StatLabel>Applied Jobs</StatLabel>
-                        <img src={BriefCase} alt="Applied Jobs" style={{ width: '24px', height: '24px' }} />
-                    </StatBox>
-
-                    <StatBox style={{ backgroundColor: isDarkMode ? '#910c2039':'#dd082839', color: isDarkMode ? '#e8e6e3' : '#18191c'}}>
-                        <StatNumber>{dashboardData?.favorite_nums || 0}</StatNumber>
-                        <StatLabel>Favorite Jobs</StatLabel>
-                        <img src={Favorite} alt="Favorite Jobs" style={{ width: '24px', height: '24px' }} />
-                    </StatBox>
-                    
-                    <StatBox style={{ backgroundColor: isDarkMode ? '#003c24':'#16d50452', color: isDarkMode ? '#e8e6e3' : '#18191c'}}>
-                        <StatNumber>{dashboardData?.alert || 0}</StatNumber>
-                        <StatLabel>Job Alerts</StatLabel>
-                        <img src={Bell} alt="Job Alerts" style={{ width: '24px', height: '24px' }} />
-                    </StatBox>
-                </StatsContainer>
-
                 <RecentlyAppliedSection>
                     <HeaderRow>
-                        <h3>Recently Applied</h3>
-                        <ViewAll onClick={()=>setSelectedBar("appliedJobs")} >View all →</ViewAll>
+                        <h3>Favorite Jobs</h3>
                     </HeaderRow>
                     <JobsTable>
                         <TableHeader>
                             <TableRow>
                                 <TableHeaderCell>Job</TableHeaderCell>
-                                <TableHeaderCell>Date Applied</TableHeaderCell>
+                                <TableHeaderCell>Posted Date</TableHeaderCell>
                                 <TableHeaderCell>Status</TableHeaderCell>
                                 <TableHeaderCell>Action</TableHeaderCell>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {dashboardData?.recently_applied?.map((job, index) => (
+                            {favoritesJobsData?.map((job, index) => (
                                 <TableRow key={index}>
                                     <TableCell>
                                         <JobInfo>
-                                            {job.profile_picture ? (
-                                                <CompanyLogo>
-                                                    <img src={job.profile_picture} alt={job.company_name} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
-                                                </CompanyLogo>
-                                            ) : (
-                                                <CompanyLogo style={{backgroundColor: '#25C277'}}>{job.company_name?.substring(0, 2)}</CompanyLogo>
-                                            )}
+                                            <CompanyLogo style={{backgroundColor: '#25C277'}}>
+                                                {job.company_name?.substring(0, 2)}
+                                            </CompanyLogo>
                                             <JobDetails>
                                                 <JobTitle>{job.company_name}</JobTitle>
                                                 <JobMeta>
                                                     <Location>{job.country}</Location>
-                                                    <Salary>${job.salary}{job.salary_type === 'fixed' ? '-/month' : '-/hour'}</Salary>
-                                                    {/* <JobType>{job.salary_type}</JobType> */}
+                                                    <Salary>${job.salary}</Salary>
+                                                    <JobType>{job.job_type}</JobType>
                                                 </JobMeta>
                                             </JobDetails>
                                         </JobInfo>
                                     </TableCell>
-                                    <TableCell>{new Date(job.applied_date).toLocaleString()}</TableCell>
-                                    <TableCell><StatusBadge>Active</StatusBadge></TableCell>
-                                    <TableCell><ViewDetailsButton>View Details</ViewDetailsButton></TableCell>
+                                    <TableCell>
+                                        {new Date(job.posted_date).toLocaleString()}
+                                    </TableCell>
+                                    <TableCell>
+                                        <StatusBadge>Active</StatusBadge>
+                                    </TableCell>
+                                    <TableCell>
+                                        <ViewDetailsButton onClick={()=>window.location.href = `/details?jobId=${job.job_id}`}>View Details</ViewDetailsButton>
+                                    </TableCell>
                                 </TableRow>
                             ))}
+                            {favoritesJobsData?.length === 0 && (
+                                <TableRow>
+                                    <TableCell colSpan="4" style={{textAlign: 'center'}}>
+                                        No Favorite Jobs Found.
+                                    </TableCell>
+                                </TableRow>
+                            )}
                         </TableBody>
                     </JobsTable>
                 </RecentlyAppliedSection>
@@ -142,9 +119,7 @@ export function OverView({setSelectedBar}){
 const Dash = styled.div`
     display: flex;
     flex: 1;
-    border-left: 1px solid ${({theme})=>theme.weakBorderColor};;
-    background-color: ${({theme})=>theme.background};
-    //color: ${({theme})=>theme.color};;
+    border-left: 1px solid ${({theme})=>theme.weakBorderColor};
     //margin-right: 20px;
 `
 
@@ -154,54 +129,9 @@ const DashContent = styled.div`
     overflow-x: auto;
 `
 
-const Greeting = styled.h1`
-    font-size: 24px;
-    margin-bottom: 8px;
-    color: ${({theme})=>theme.color};
-`
-
-const SubText = styled.p`
-    color: ${({theme})=>theme.secColor};
-    margin-bottom: 24px;
-`
-
-const StatsContainer = styled.div`
-    display: flex;
-    gap: 20px;
-    
-    @media (max-width: 768px) {
-        flex-direction: column;
-    }
-`
-
-const StatBox = styled.div`
-    flex: 1;
-    padding: 15px;
-    border-radius: 6px;
-    position: relative;
-    
-    img {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-    }
-`
-
-const StatNumber = styled.div`
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 6px;
-`
-
-const StatLabel = styled.div`
-    color: ${({theme})=>theme.secColor};
-    font-size: 12px;
-`
-
 const RecentlyAppliedSection = styled.div`
-    color: ${({theme})=>theme.color};
-    margin-top: 30px;
+    //margin-top: 30px;
+    color:${({theme})=>theme.color}
 `
 
 const HeaderRow = styled.div`
@@ -209,13 +139,10 @@ const HeaderRow = styled.div`
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    
 `
 
-const ViewAll = styled.a`
-    color: #0066cc;
-    cursor: pointer;
-    text-decoration: none;
-`
+
 
 const JobsTable = styled.table`
     width: 100%;
@@ -224,10 +151,12 @@ const JobsTable = styled.table`
 `
 
 const TableHeader = styled.thead`
-    background-color: ${({theme})=>theme.secBackground};
+background-color:${({theme})=>theme.secBackground}
 `
 
-const TableBody = styled.tbody``
+const TableBody = styled.tbody`
+    color:${({theme})=>theme.color}
+`
 
 const TableRow = styled.tr`
     border-bottom: 1px solid ${({theme})=>theme.weakBorderColor};
@@ -343,4 +272,3 @@ const ErrorMessage = styled.div`
     text-align: center;
     padding: 20px;
 `
-

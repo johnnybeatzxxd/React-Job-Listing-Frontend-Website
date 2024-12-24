@@ -35,7 +35,6 @@ export function JobDetails() {
 
     useEffect(() => {
         if (profile && profile.favorite_jobs) {
-            console.log('its so true')
             const initialFavorites = new Set(profile.favorite_jobs);
             
             setFavorites(initialFavorites);
@@ -83,6 +82,13 @@ export function JobDetails() {
         }
     });
 
+    const formatApplicationData = (data) => ({
+        jobId: jobData.job_id,
+        userId: profile.user_id,
+        application: "",
+        resume:""
+    })
+
     const handleFavoriteToggle = async () => {
         const jobId = jobData.job_id;
         console.log(jobId)
@@ -126,13 +132,13 @@ export function JobDetails() {
 
     if (error) {
         return (
-            <div>
+            <DetailsPage>
                 <NavigationBar />
                 <CenteredError>
                     Job details not found
                 </CenteredError>
                 <FooterBar />
-            </div>
+            </DetailsPage>
         );
     }
 
@@ -140,6 +146,7 @@ export function JobDetails() {
         return <div>Loading...</div>;
     }
     const formattedJobData = formatJobData(jobData);
+
 
     return (
         <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
@@ -314,7 +321,7 @@ export function JobDetails() {
                     </Details>
                 </DetailsContainer>
                 <FooterBar />
-                <ApplicationModal isOpen={modal} onClose={() => setModal(false)} />
+                <ApplicationModal isOpen={modal} profile={profile} jobData={jobData} onClose={() => setModal(false)} />
             </DetailsPage>
         </ThemeProvider>
     );
@@ -735,5 +742,5 @@ const CenteredError = styled.div`
     justify-content: center;
     align-items: center;
     min-height: calc(100vh - 150px);
-    color: ${({ theme }) => theme.color};
+    color: ${({ theme }) => theme.secColor};
 `;

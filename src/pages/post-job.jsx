@@ -555,7 +555,7 @@ const ListItemButton = styled.button`
 const AddButton = styled.button`
   padding: 8px;
   background-color: ${({theme})=>theme.secBackground};
-  color: white;
+  color: ${({theme})=>theme.color};
   border: none;
   border-radius: 4px;
   cursor: pointer;

@@ -16,6 +16,7 @@ import Favorite from '../assets/favorite.svg'
 import Logout from '../assets/logout.svg'
 
 import { OverView } from '../components/overview-dash.jsx'
+import { FavoriteJobs } from '../components/favorite-dash.jsx';
 import { RecruitersOverView } from '../components/overview-recruiters.jsx';
 import { AppliedJobs } from '../components/applied-dash.jsx'
 import { logout } from '../utils/auth-requests.js'
@@ -222,6 +223,7 @@ const SideBar = styled.div`
     flex-direction: column;
     height: calc(100vh - 100px);
     width: 25%;
+    min-width: 20%;
     padding: 20px 0px 20px 0;
     position: sticky;
     top: 0;

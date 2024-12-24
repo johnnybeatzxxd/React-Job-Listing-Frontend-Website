@@ -139,7 +139,7 @@ const NavTab = styled.button`
     display: flex;
     justify-content: center;
     align-items: center;
-    width: auto;
+    min-width: 89px;
     height: 100%;
     background-color: transparent;
     color: ${({ theme }) => theme.secColor};
@@ -176,7 +176,7 @@ const Tabs  = styled.div`
 const LeftSpace = styled.div`
     padding-left: 130px;
 
-    @media (max-width: 768px) {
+    @media (max-width: 905px) {
         padding-left: 10px;
     }
 `
@@ -191,7 +191,7 @@ const Navbody = styled.div`
     padding-bottom: 10px;
     background-color: ${({ theme }) => theme.background};
 
-    @media (max-width: 768px) {
+    @media (max-width: 905px) {
         flex-direction: column;
         align-items: center;
     }
@@ -220,7 +220,7 @@ const Search = styled.div`
     border: 1px solid ${({ theme }) => theme.weakBorderColor};
     border-radius: 5px;
 
-    @media (max-width: 768px) {
+    @media (max-width: 905px) {
         width: 100%;
         margin-top: 10px;
     }
@@ -246,8 +246,8 @@ const SearchInput = styled.input`
     outline: none;
     color: ${({ theme }) => theme.color};
 
-    @media (max-width: 768px) {
-        width: 70%;
+    @media (max-width: 905px) {
+        width: 100%;
     }
 `
 const Navbuttons = styled.div`
@@ -258,7 +258,7 @@ const Navbuttons = styled.div`
     width: 30%;
     margin-right: 20px;
 
-    @media (max-width: 768px) {
+    @media (max-width: 905px) {
         justify-content: center;
         width: 100%;
         margin-top: 10px;
@@ -300,5 +300,15 @@ const ThemeIcon = styled.img`
     transform: translateY(-50%);
     cursor: pointer;
     font-size: 1.2rem;
+    @media (max-width: 768px) {
+        right: 25px;
+        top: 65px;
+        transform: translateY(-50%);
+    }
+    @media (max-width: 405px) {
+        right: 20px;
+        top: 71px;
+        transform: translateY(-50%);
+    }
 `
 

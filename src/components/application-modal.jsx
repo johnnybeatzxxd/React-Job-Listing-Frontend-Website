@@ -1,26 +1,54 @@
 import { styled, ThemeProvider } from 'styled-components'
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import { Context } from '../App.jsx'
 import { lightTheme, darkTheme } from '../utils/theme.js'
+import { applyJob } from '../utils/job-requests.js';
+import { toast } from 'react-hot-toast';
 
-export function ApplicationModal({ isOpen, onClose }) {
+export function ApplicationModal({ isOpen, onClose,profile,jobData }) {
     const [isDarkMode] = useContext(Context)
+    const [resume, setResume] = useState('')
+    const [application, setApplication] = useState('')
+
+    const formatApplicationData = (data) => ({
+        jobId: jobData.job_id,
+        userId: profile.user_id,
+        application: application,
+        resume: resume
+    })
 
     if (!isOpen) return null
+
+    const onApply = async () => {
+        if (application === ''){
+            toast.error("The cover letter is empty.")
+        }else{
+        try {
+            const applicationData = formatApplicationData()
+            await applyJob(applicationData)
+            toast.success("Application submitted.")
+            onClose() 
+        } catch (error) {
+            console.error('Failed to submit application:', error)
+            toast.error("Failed to submit application")
+
+        }
+    }
+}
 
     return (
         <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
             <ModalOverlay>
                 <ModalContent>
                     <ModalHeader>
-                        <h3>Apply Job: Senior UX Designer</h3>
+                        <h3>Apply Job: {jobData.jobTitle}</h3>
                         <CloseButton onClick={onClose}>×</CloseButton>
                     </ModalHeader>
 
                     <ModalBody>
                         <FormGroup>
                             <Label>Choose Resume</Label>
-                            <Select>
+                            <Select value={resume} onChange={(e) => setResume(e.target.value)}>
                                 <option value="">Select...</option>
                             </Select>
                         </FormGroup>
@@ -38,6 +66,8 @@ export function ApplicationModal({ isOpen, onClose }) {
                                     <ToolbarButton>⋮</ToolbarButton>
                                 </EditorToolbar>
                                 <TextArea 
+                                    value={application}
+                                    onChange={(e) => setApplication(e.target.value)}
                                     placeholder="Write down your biography here. Let the employers know who you are..."
                                 />
                             </TextEditor>
@@ -45,7 +75,7 @@ export function ApplicationModal({ isOpen, onClose }) {
 
                         <ButtonGroup>
                             <CancelButton onClick={onClose}>Cancel</CancelButton>
-                            <ApplyButton>
+                            <ApplyButton onClick={onApply}>
                                 Apply Now
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                                     <path d="M4.167 10h11.666M10 4.167L15.833 10 10 15.833" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
