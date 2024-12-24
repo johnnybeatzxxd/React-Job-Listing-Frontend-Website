@@ -155,7 +155,7 @@ export function JobDetails() {
                 <Header>
                     <HeaderContent>
                         <HeaderText>Job Details</HeaderText>
-                        <Path style={{ display: "flex", alignItems: "center" }}>
+                        <Path style={{ alignItems: "center" }}>
                             <span style={{ margin: "0 1px" }}>Home</span>
                             <span style={{ margin: "0 1px" }}>/</span>
                             <span style={{ margin: "0 1px" }}>Find Job</span>
@@ -347,6 +347,11 @@ const HeaderContent = styled.div`
     align-items: center;
     width: 90.3%;
     height: 100%;
+
+    @media (max-width: 768px) {
+        width: 95%;
+        padding: 0 10px;
+    }
 `
 const HeaderText = styled.h2`
     font-optical-sizing: auto;
@@ -360,11 +365,15 @@ const HeaderText = styled.h2`
     }
 `
 const Path = styled.div`
-    display: flex;
+    display: none;
     font-size: 0.9rem;
     gap: 5px;
     color: ${({ theme }) => theme.secColor};
     margin-right: 20px;
+
+    @media (min-width: 550px) {
+        display: flex;
+    }
 `
 const DetailsContainer = styled.div`
     display: flex;
@@ -412,9 +421,9 @@ const DetailsHeader = styled.div`
         flex-direction: column;
         gap: 20px;
         margin-right: 0;
-        padding: 20px 16px;
+        padding: 20px 10px;
         height: auto;
-        width: 90%;
+        width: 100%;
         align-items: flex-start;
     }
 `
@@ -449,6 +458,8 @@ const JobTitle = styled.h1`
 
     @media (max-width: 768px) {
         font-size: 16px;
+        word-break: break-word;
+        max-width: 100%;
     }
 `
 const CompanyDetails = styled.div`
@@ -458,6 +469,10 @@ const CompanyDetails = styled.div`
     color: #7C8493;
     font-size: 14px;
     
+    @media (max-width: 768px) {
+        flex-wrap: wrap;
+        line-height: 1.5;
+    }
 `
 const HeaderRight = styled.div`
     display: flex;
@@ -567,9 +582,12 @@ const FirstSection = styled.div`
     flex-direction: row;
     height: 150px;
     justify-content: center;
+    align-items: center;
     gap: 75px;
     border-radius: 10px;
     border-bottom: 1px solid ${({ theme }) => theme.weakBorderColor};
+    padding: 20px 0;
+    width: 100%;
 
     @media (max-width: 768px) {
         flex-direction: column;
@@ -586,10 +604,9 @@ const SecondSection = styled.div`
 const SalarySection = styled.div`
     display: flex;
     flex-direction: column;
-    //border: 2px solid red;
     justify-content: center;
     align-items: center;
-    //margin-bottom: 20px;
+    text-align: center;
 `
 
 const Amount = styled.div`
@@ -606,9 +623,9 @@ const Period = styled.div`
 const LocationSection = styled.div`
     display: flex;
     flex-direction: column;
-    //border: 2px solid red;
     justify-content: center;
     align-items: center;
+    text-align: center;
 `
 
 const JobOverview = styled.div`
@@ -744,3 +761,5 @@ const CenteredError = styled.div`
     min-height: calc(100vh - 150px);
     color: ${({ theme }) => theme.secColor};
 `;
+
+
