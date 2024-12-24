@@ -155,7 +155,7 @@ export function RecruitersOverView({setSelectedBar}){
                                     <TableCell data-label="Applied For">{application.job_title?.substring(0, 20)}{application.job_title?.length > 20 ? '...' : ''}</TableCell>
                                     <TableCell data-label="Date Applied">{new Date(application.applied_date).toLocaleString()}</TableCell>
                                     <TableCell data-label="Status"><StatusBadge>New</StatusBadge></TableCell>
-                                    <TableCell data-label="Action"><ViewDetailsButton>Review</ViewDetailsButton></TableCell>
+                                    <TableCell data-label="Action"><ViewDetailsButton >Review</ViewDetailsButton></TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

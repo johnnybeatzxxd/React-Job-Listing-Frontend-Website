@@ -18,9 +18,10 @@ import Logout from '../assets/logout.svg'
 import { OverView } from '../components/overview-dash.jsx'
 import { FavoriteJobs } from '../components/favorite-dash.jsx';
 import { RecruitersOverView } from '../components/overview-recruiters.jsx';
-import { AppliedJobs } from '../components/applied-dash.jsx'
+import { AppliedJobs } from '../components/applied-dash.jsx';
+import { Applications } from '../components/applications-dash.jsx';
 import { logout } from '../utils/auth-requests.js'
-
+import { JobPostings } from '../components/job-postings.jsx';
 import { ThemeProvider } from 'styled-components';
 import { lightTheme, darkTheme } from '../utils/theme.js';
 import { useContext, useEffect } from 'react'

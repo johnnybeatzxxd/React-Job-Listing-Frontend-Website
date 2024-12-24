@@ -11,7 +11,7 @@ export function FooterBar(){
             <FooterContent>
                 <FooterSection>
                     <img src={LogoImage} alt="Jobpilot" style={{ height: '30px' }} />
-                    <div>Call now: (+251) 977276556 </div>
+                    <div>Call now: (+251) 977XXXXXX </div>
                     
                 </FooterSection>
                 {footerLinks.map((section, index) => (

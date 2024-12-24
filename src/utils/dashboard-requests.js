@@ -60,3 +60,30 @@ export function favoriteJobs() {
             return { success: false, message: error.response.data.error || 'An error occurred',user: error.response.data.user };
         });
 }
+
+
+export function myJobs() {
+    const config = createRequestConfig(`${backend_url}/api/users/dashboard/my_jobs`,null,'get');
+
+    return axios.request(config)
+        .then((response) => {
+            return { success: true, message: response.data.message };
+        })
+        .catch((error) => {
+            console.log(error);
+            return { success: false, message: error.response.data.error || 'An error occurred',user: error.response.data.user };
+        });
+}
+export function myApplications() {
+    const config = createRequestConfig(`${backend_url}/api/users/dashboard/my_applications`,null,'get');
+
+    return axios.request(config)
+        .then((response) => {
+            return { success: true, message: response.data.message };
+        })
+        .catch((error) => {
+            console.log(error);
+            return { success: false, message: error.response.data.error || 'An error occurred',user: error.response.data.user };
+        });
+}
+
