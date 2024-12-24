@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { styled } from 'styled-components'
 import '../index.css'
 import { NavigationBar } from './navbar.jsx'
@@ -18,15 +18,46 @@ import { ThemeProvider } from 'styled-components';
 import { lightTheme, darkTheme } from '../utils/theme.js';
 import { useContext } from 'react'
 import { Context } from '../App.jsx'
+import { overview } from '../utils/dashboard-requests.js'
+import { FourSquare } from "react-loading-indicators";
 
 export function RecruitersOverView({setSelectedBar}){
     const [isDarkMode, setIsDarkMode, profile] = useContext(Context);
+    const [dashboardData, setDashboardData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        overview()
+            .then((response) => {
+                if (response.success) {
+                    setDashboardData(response.message);
+                } else {
+                    setError(response.message);
+                }
+                setLoading(false);
+            });
+    }, []);
+
     let firstName = '';
     try {
         firstName = profile.full_name.split(" ")[0];
     } catch {
         firstName = profile.full_name;
     }
+
+    if (loading) {
+        return (
+            <LoadingContainer>
+                <FourSquare color="#0B65C6" size="medium" text="" textColor="" />
+            </LoadingContainer>
+        );
+    }
+
+    if (error) {
+        return <ErrorMessage>Error loading dashboard: {error}</ErrorMessage>;
+    }
+
     return(
         <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}> 
         <Dash>
@@ -36,20 +67,20 @@ export function RecruitersOverView({setSelectedBar}){
             
             <StatsContainer>
                 <StatBox style={{ backgroundColor: isDarkMode ? '#0c43913c':'#0d67e53b', color: isDarkMode ? '#e8e6e3' : '#18191c'}}>
-                    <StatNumber>12</StatNumber>
+                    <StatNumber>{dashboardData.active_jobs}</StatNumber>
                     <StatLabel>Active Jobs</StatLabel>
                     <img src={BriefCase} alt="Active Jobs" style={{ width: '24px', height: '24px' }} />
                 </StatBox>
 
                 <StatBox style={{ backgroundColor: isDarkMode ? '#910c2039':'#dd082839', color: isDarkMode ? '#e8e6e3' : '#18191c'}}>
-                    <StatNumber>48</StatNumber>
+                    <StatNumber>{dashboardData.total_applications}</StatNumber>
                     <StatLabel>Total Applications</StatLabel>
                     <img src={Stack} alt="Applications" style={{ width: '24px', height: '24px' }} />
                 </StatBox>
                 
                 <StatBox style={{ backgroundColor: isDarkMode ? '#003c24':'#16d50452', color: isDarkMode ? '#e8e6e3' : '#18191c'}}>
-                    <StatNumber>15</StatNumber>
-                    <StatLabel>Shortlisted</StatLabel>
+                    <StatNumber>{dashboardData.total_applications}</StatNumber>
+                    <StatLabel>Total Views</StatLabel>
                     <img src={Favorite} alt="Shortlisted" style={{ width: '24px', height: '24px' }} />
                 </StatBox>
             </StatsContainer>
@@ -61,7 +92,13 @@ export function RecruitersOverView({setSelectedBar}){
                 </HeaderRow>
                 <CompanyCard>
                     <CompanyHeader>
-                        <CompanyLogo style={{backgroundColor: '#25C277'}}>{profile.company_name?.[0]}</CompanyLogo>
+                        {profile.profile_image_url ? (
+                            <CompanyLogo>
+                                <img src={profile.profile_image_url} alt={profile.company_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            </CompanyLogo>
+                        ) : (
+                            <CompanyLogo style={{backgroundColor: '#25C277'}}>{profile.company_name?.[0]}</CompanyLogo>
+                        )}
                         <CompanyDetails>
                             <CompanyName>{profile.company_name || 'Your Company'}</CompanyName>
                             <CompanyMeta>
@@ -81,91 +118,49 @@ export function RecruitersOverView({setSelectedBar}){
                     <h3>Recent Applications</h3>
                     <ViewAll onClick={()=>setSelectedBar("applications")}>View all →</ViewAll>
                 </HeaderRow>
-                <JobsTable>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHeaderCell>Candidate</TableHeaderCell>
-                            <TableHeaderCell>Applied For</TableHeaderCell>
-                            <TableHeaderCell>Date Applied</TableHeaderCell>
-                            <TableHeaderCell>Status</TableHeaderCell>
-                            <TableHeaderCell>Action</TableHeaderCell>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        <TableRow>
-                            <TableCell>
-                                <JobInfo>
-                                    <CompanyLogo style={{backgroundColor: '#25C277'}}>JD</CompanyLogo>
-                                    <JobDetails>
-                                        <JobTitle>John Doe</JobTitle>
-                                        <JobMeta>
-                                            <Location>Senior Developer</Location>
-                                            <Experience>5 years exp.</Experience>
-                                        </JobMeta>
-                                    </JobDetails>
-                                </JobInfo>
-                            </TableCell>
-                            <TableCell>Networking Engineer</TableCell>
-                            <TableCell>Feb 2, 2024 19:28</TableCell>
-                            <TableCell><StatusBadge>New</StatusBadge></TableCell>
-                            <TableCell><ViewDetailsButton>Review</ViewDetailsButton></TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>
-                                <JobInfo>
-                                    <CompanyLogo style={{backgroundColor: '#25C277'}}>JD</CompanyLogo>
-                                    <JobDetails>
-                                        <JobTitle>John Doe</JobTitle>
-                                        <JobMeta>
-                                            <Location>Senior Developer</Location>
-                                            <Experience>5 years exp.</Experience>
-                                        </JobMeta>
-                                    </JobDetails>
-                                </JobInfo>
-                            </TableCell>
-                            <TableCell>Networking Engineer</TableCell>
-                            <TableCell>Feb 2, 2024 19:28</TableCell>
-                            <TableCell><StatusBadge>New</StatusBadge></TableCell>
-                            <TableCell><ViewDetailsButton>Review</ViewDetailsButton></TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>
-                                <JobInfo>
-                                    <CompanyLogo style={{backgroundColor: '#25C277'}}>JD</CompanyLogo>
-                                    <JobDetails>
-                                        <JobTitle>John Doe</JobTitle>
-                                        <JobMeta>
-                                            <Location>Senior Developer</Location>
-                                            <Experience>5 years exp.</Experience>
-                                        </JobMeta>
-                                    </JobDetails>
-                                </JobInfo>
-                            </TableCell>
-                            <TableCell>Networking Engineer</TableCell>
-                            <TableCell>Feb 2, 2024 19:28</TableCell>
-                            <TableCell><StatusBadge>New</StatusBadge></TableCell>
-                            <TableCell><ViewDetailsButton>Review</ViewDetailsButton></TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>
-                                <JobInfo>
-                                    <CompanyLogo style={{backgroundColor: '#25C277'}}>JD</CompanyLogo>
-                                    <JobDetails>
-                                        <JobTitle>John Doe</JobTitle>
-                                        <JobMeta>
-                                            <Location>Senior Developer</Location>
-                                            <Experience>5 years exp.</Experience>
-                                        </JobMeta>
-                                    </JobDetails>
-                                </JobInfo>
-                            </TableCell>
-                            <TableCell>Networking Engineer</TableCell>
-                            <TableCell>Feb 2, 2024 19:28</TableCell>
-                            <TableCell><StatusBadge>New</StatusBadge></TableCell>
-                            <TableCell><ViewDetailsButton>Review</ViewDetailsButton></TableCell>
-                        </TableRow>
-                    </TableBody>
-                </JobsTable>
+                <TableWrapper>
+                    <JobsTable>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHeaderCell>Candidate</TableHeaderCell>
+                                <TableHeaderCell>Applied For</TableHeaderCell>
+                                <TableHeaderCell>Date Applied</TableHeaderCell>
+                                <TableHeaderCell>Status</TableHeaderCell>
+                                <TableHeaderCell>Action</TableHeaderCell>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {dashboardData?.recently_applied?.map((application, index) => (
+                                <TableRow 
+                                    key={index} 
+                                    $isClickable={true}
+                                    onClick={() => {
+                                        console.log('Clicked application:', application);
+                                    }}
+                                >
+                                    <TableCell>
+                                        <JobInfo>
+                                            <CompanyLogo style={{backgroundColor: '#25C277'}}>
+                                                {application.applicant_name?.substring(0, 2)}
+                                            </CompanyLogo>
+                                            <JobDetails>
+                                                <JobTitle>{application.applicant_name}</JobTitle>
+                                                <JobMeta>
+                                                    <Location>{application.applicant_title?.substring(0, 20)}{application.applicant_title?.length > 20 ? '...' : ''}</Location>
+                                                    
+                                                </JobMeta>
+                                            </JobDetails>
+                                        </JobInfo>
+                                    </TableCell>
+                                    <TableCell data-label="Applied For">{application.job_title?.substring(0, 20)}{application.job_title?.length > 20 ? '...' : ''}</TableCell>
+                                    <TableCell data-label="Date Applied">{new Date(application.applied_date).toLocaleString()}</TableCell>
+                                    <TableCell data-label="Status"><StatusBadge>New</StatusBadge></TableCell>
+                                    <TableCell data-label="Action"><ViewDetailsButton>Review</ViewDetailsButton></TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </JobsTable>
+                </TableWrapper>
             </RecentlyAppliedSection>
         </DashContent>
     </Dash>
@@ -250,19 +245,58 @@ const ViewAll = styled.a`
     text-decoration: none;
 `
 
+const TableWrapper = styled.div`
+    width: 100%;
+    overflow-x: auto;
+    display: block;
+    -webkit-overflow-scrolling: touch;
+`
+
 const JobsTable = styled.table`
     width: 100%;
     border-collapse: collapse;
+    
+    @media (max-width: 1200px) {
+        min-width: 900px;
+    }
+
+    @media (max-width: 768px) {
+        min-width: unset;
+        display: block;
+    }
 `
 
 const TableHeader = styled.thead`
     background-color: ${({theme})=>theme.secBackground};
+
+    @media (max-width: 768px) {
+        display: none; // Hide headers on mobile
+    }
 `
 
-const TableBody = styled.tbody``
+const TableBody = styled.tbody`
+    @media (max-width: 768px) {
+        display: block;
+    }
+`
 
 const TableRow = styled.tr`
     border-bottom: 1px solid ${({theme})=>theme.weakBorderColor};
+    cursor: ${props => props.$isClickable ? 'pointer' : 'default'};
+    transition: background-color 0.2s ease;
+
+    &:hover {
+        background-color: ${({theme}) => theme.secBackground};
+    }
+
+    @media (max-width: 768px) {
+        display: block;
+        padding: 15px 0;
+        
+        &:not(:last-child) {
+            border-bottom: 2px solid ${({theme})=>theme.weakBorderColor};
+        }
+    }
 `
 
 const TableHeaderCell = styled.th`
@@ -274,6 +308,21 @@ const TableHeaderCell = styled.th`
 
 const TableCell = styled.td`
     padding: 12px;
+
+    @media (max-width: 768px) {
+        display: block;
+        padding: 5px 12px;
+        
+        &:not(:first-child) {
+            &::before {
+                content: attr(data-label);
+                font-weight: bold;
+                display: inline-block;
+                width: 120px;
+                color: ${({theme})=>theme.secColor};
+            }
+        }
+    }
 `
 
 const JobInfo = styled.div`
@@ -389,4 +438,19 @@ const CompanyWebsite = styled.a`
 
 const Experience = styled.span`
     color: ${({theme})=>theme.secColor};
+`
+
+const LoadingContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    padding: 20px;
+`
+
+const ErrorMessage = styled.div`
+    color: red;
+    text-align: center;
+    padding: 20px;
 `
