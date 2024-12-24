@@ -12,6 +12,7 @@ import { createContext, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { get_profile } from './utils/auth-requests.js';
 import { PostJob } from './pages/post-job.jsx';
+import Modal from 'react-modal';
 
 export const Context = createContext()
 function App() {
@@ -64,5 +65,7 @@ function App() {
     </>
   )
 }
+
+Modal.setAppElement('#root');
 
 export default App

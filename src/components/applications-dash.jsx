@@ -18,21 +18,24 @@ import { ThemeProvider } from 'styled-components';
 import { lightTheme, darkTheme } from '../utils/theme.js';
 import { useContext } from 'react'
 import { Context } from '../App.jsx'
-import { appliedJobs } from '../utils/dashboard-requests.js'
+import { myApplications, myJobs } from '../utils/dashboard-requests.js'
 import { FourSquare } from "react-loading-indicators";
 
-export function AppliedJobs(){
+
+
+
+export function Applications(){
     const [isDarkMode, setIsDarkMode] = useContext(Context);
-    const [appliedJobsData, setAppliedJobsData] = useState(null);
+    const [applicationsData, setApplicationsData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [selectedJob, setSelectedJob] = useState(null);
+    const [selectedApplication, setSelectedApplication] = useState(null);
 
     useEffect(() => {
-        appliedJobs()
+        myApplications()
             .then((response) => {
                 if (response.success) {
-                    setAppliedJobsData(response.message);
+                    setApplicationsData(response.message);
                 } else {
                     setError(response.message);
                 }
@@ -40,12 +43,12 @@ export function AppliedJobs(){
             });
     }, []);
 
-    const handleViewDetails = (job) => {
-        setSelectedJob(job);
+    const handleViewDetails = (application) => {
+        setSelectedApplication(application);
     };
 
     const closeModal = () => {
-        setSelectedJob(null);
+        setSelectedApplication(null);
     };
 
     if (loading) {
@@ -57,7 +60,7 @@ export function AppliedJobs(){
     }
 
     if (error) {
-        return <ErrorMessage>Error loading applied jobs: {error}</ErrorMessage>;
+        return <ErrorMessage>Error loading Favorite jobs: {error}</ErrorMessage>;
     }
 
     return(
@@ -66,52 +69,57 @@ export function AppliedJobs(){
             <DashContent>
                 <RecentlyAppliedSection>
                     <HeaderRow>
-                        <h3>Applied Jobs</h3>
+                        <h3>My Applications</h3>
                     </HeaderRow>
                     <JobsTable>
                         <TableHeader>
                             <TableRow>
                                 <TableHeaderCell>Job</TableHeaderCell>
-                                <TableHeaderCell>Date Applied</TableHeaderCell>
-                                <TableHeaderCell>Status</TableHeaderCell>
+                                <TableHeaderCell>Applied Date</TableHeaderCell>
+                                <TableHeaderCell>Resume</TableHeaderCell>
                                 <TableHeaderCell>Action</TableHeaderCell>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {appliedJobsData?.map((job, index) => (
+                            {applicationsData?.map((application, index) => (
                                 <TableRow key={index}>
                                     <TableCell>
                                         <JobInfo>
                                             <CompanyLogo style={{backgroundColor: '#25C277'}}>
-                                                {job.company_name?.substring(0, 2)}
+                                                {application.candidate_name?.substring(0, 2)}
                                             </CompanyLogo>
                                             <JobDetails>
-                                                <JobTitle>{job.company_name}</JobTitle>
+                                                <JobTitle>{application.candidate_name?.substring(0, 20)}{application.job_title?.length > 20 ? '...' : ''}</JobTitle>
                                                 <JobMeta>
-                                                    <Location>{job.country}</Location>
-                                                    <Salary>${job.salary}</Salary>
-                                                    <JobType>{job.job_type}</JobType>
+                                                    <Location>{application.candidate_country}</Location>
+                                                    
                                                 </JobMeta>
                                             </JobDetails>
                                         </JobInfo>
                                     </TableCell>
                                     <TableCell>
-                                        {new Date(job.applied_date).toLocaleString()}
+                                        {new Date(application.applied_date).toLocaleString()}
                                     </TableCell>
                                     <TableCell>
-                                        <StatusBadge>Active</StatusBadge>
+                                        {application.resume ? (
+                                            <ViewResumeLink href={application.resume} target="_blank">
+                                                View Resume
+                                            </ViewResumeLink>
+                                        ) : (
+                                            <span>No Resume</span>
+                                        )}
                                     </TableCell>
                                     <TableCell>
-                                        <ViewDetailsButton onClick={() => handleViewDetails(job)}>
+                                        <ViewDetailsButton onClick={() => handleViewDetails(application)}>
                                             View Details
                                         </ViewDetailsButton>
                                     </TableCell>
                                 </TableRow>
                             ))}
-                            {appliedJobsData?.length === 0 && (
+                            {applicationsData?.length === 0 && (
                                 <TableRow>
                                     <TableCell colSpan="4" style={{textAlign: 'center'}}>
-                                        No applied jobs found
+                                        No Applications Found.
                                     </TableCell>
                                 </TableRow>
                             )}
@@ -120,7 +128,7 @@ export function AppliedJobs(){
                 </RecentlyAppliedSection>
             </DashContent>
 
-            {selectedJob && (
+            {selectedApplication && (
                 <ModalOverlay onClick={closeModal}>
                     <ModalContent onClick={e => e.stopPropagation()}>
                         <ModalHeader>
@@ -129,41 +137,45 @@ export function AppliedJobs(){
                         </ModalHeader>
                         <ModalBody>
                             <DetailSection>
-                                <SectionTitle>Job Information</SectionTitle>
+                                <SectionTitle>Candidate Information</SectionTitle>
                                 <DetailGrid>
                                     <DetailCard>
-                                        <DetailLabel>Company</DetailLabel>
-                                        <DetailValue>{selectedJob.company_name}</DetailValue>
+                                        <DetailLabel>Full Name</DetailLabel>
+                                        <DetailValue>{selectedApplication.candidate_name}</DetailValue>
                                     </DetailCard>
                                     <DetailCard>
-                                        <DetailLabel>Job Title</DetailLabel>
-                                        <DetailValue>{selectedJob.job_title}</DetailValue>
+                                        <DetailLabel>Email</DetailLabel>
+                                        <DetailValue>{selectedApplication.candidate_email}</DetailValue>
                                     </DetailCard>
                                     <DetailCard>
-                                        <DetailLabel>Location</DetailLabel>
-                                        <DetailValue>{selectedJob.country}</DetailValue>
+                                        <DetailLabel>Title</DetailLabel>
+                                        <DetailValue>{selectedApplication.candidate_title}</DetailValue>
                                     </DetailCard>
                                     <DetailCard>
-                                        <DetailLabel>Salary</DetailLabel>
-                                        <DetailValue>${selectedJob.salary}</DetailValue>
-                                    </DetailCard>
-                                    <DetailCard>
-                                        <DetailLabel>Job Type</DetailLabel>
-                                        <DetailValue>{selectedJob.job_type}</DetailValue>
-                                    </DetailCard>
-                                    <DetailCard>
-                                        <DetailLabel>Applied Date</DetailLabel>
-                                        <DetailValue>
-                                            {new Date(selectedJob.applied_date).toLocaleString()}
-                                        </DetailValue>
+                                        <DetailLabel>Country</DetailLabel>
+                                        <DetailValue>{selectedApplication.candidate_country}</DetailValue>
                                     </DetailCard>
                                 </DetailGrid>
                             </DetailSection>
 
                             <DetailSection>
-                                <SectionTitle>Your Application</SectionTitle>
+                                <SectionTitle>Application Information</SectionTitle>
+                                <DetailGrid>
+                                    <DetailCard>
+                                        <DetailLabel>Job Title</DetailLabel>
+                                        <DetailValue>{selectedApplication.job_title}</DetailValue>
+                                    </DetailCard>
+                                    <DetailCard>
+                                        <DetailLabel>Applied Date</DetailLabel>
+                                        <DetailValue>{new Date(selectedApplication.applied_date).toLocaleString()}</DetailValue>
+                                    </DetailCard>
+                                </DetailGrid>
+                            </DetailSection>
+
+                            <DetailSection>
+                                <SectionTitle>Application Statement</SectionTitle>
                                 <ApplicationText>
-                                    {selectedJob.application}
+                                    {selectedApplication.application_text}
                                 </ApplicationText>
                             </DetailSection>
                         </ModalBody>
@@ -332,6 +344,15 @@ const ErrorMessage = styled.div`
     padding: 20px;
 `
 
+const ViewResumeLink = styled.a`
+    color: #0066cc;
+    text-decoration: none;
+    
+    &:hover {
+        text-decoration: underline;
+    }
+`
+
 const ModalOverlay = styled.div`
     position: fixed;
     top: 0;
@@ -445,4 +466,5 @@ const CloseButton = styled.button`
         background-color: ${({theme}) => theme.secBackground};
     }
 `
+
 
