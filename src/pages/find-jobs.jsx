@@ -335,7 +335,7 @@ export default function FindJobs(){
                                 <FourSquare color="#0B65C6" size="medium" text="" textColor="" />
                             </LoaderContainer>
                         ) : jobs.length > 0 ? (
-                            jobs.map((job, index) => (
+                            jobs.toReversed().map((job, index) => (
                                 <JobCard 
                                     onClick={() => {
                                         window.location.href = `/details?jobId=${job.id}`;
