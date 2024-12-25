@@ -26,6 +26,7 @@ export function RecruitersOverView({setSelectedBar}){
     const [dashboardData, setDashboardData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedApplication, setSelectedApplication] = useState(null);
 
     useEffect(() => {
         overview()
@@ -45,6 +46,14 @@ export function RecruitersOverView({setSelectedBar}){
     } catch {
         firstName = profile.full_name;
     }
+
+    const handleViewDetails = (application) => {
+        setSelectedApplication(application);
+    };
+
+    const closeModal = () => {
+        setSelectedApplication(null);
+    };
 
     if (loading) {
         return (
@@ -134,9 +143,7 @@ export function RecruitersOverView({setSelectedBar}){
                                 <TableRow 
                                     key={index} 
                                     $isClickable={true}
-                                    onClick={() => {
-                                        console.log('Clicked application:', application);
-                                    }}
+                                    onClick={() => handleViewDetails(application)}
                                 >
                                     <TableCell>
                                         <JobInfo>
@@ -155,7 +162,14 @@ export function RecruitersOverView({setSelectedBar}){
                                     <TableCell data-label="Applied For">{application.job_title?.substring(0, 20)}{application.job_title?.length > 20 ? '...' : ''}</TableCell>
                                     <TableCell data-label="Date Applied">{new Date(application.applied_date).toLocaleString()}</TableCell>
                                     <TableCell data-label="Status"><StatusBadge>New</StatusBadge></TableCell>
-                                    <TableCell data-label="Action"><ViewDetailsButton >Review</ViewDetailsButton></TableCell>
+                                    <TableCell data-label="Action">
+                                        <ViewDetailsButton onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleViewDetails(application);
+                                        }}>
+                                            Review
+                                        </ViewDetailsButton>
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -164,6 +178,45 @@ export function RecruitersOverView({setSelectedBar}){
             </RecentlyAppliedSection>
         </DashContent>
     </Dash>
+    {selectedApplication && (
+        <ModalOverlay onClick={closeModal}>
+            <ModalContent onClick={e => e.stopPropagation()}>
+                <ModalHeader>
+                    <h2>Application Details</h2>
+                    <CloseButton onClick={closeModal}>&times;</CloseButton>
+                </ModalHeader>
+                <ModalBody>
+                    <DetailSection>
+                        <SectionTitle>Candidate Information</SectionTitle>
+                        <DetailGrid>
+                            <DetailCard>
+                                <DetailLabel>Full Name</DetailLabel>
+                                <DetailValue>{selectedApplication.applicant_name}</DetailValue>
+                            </DetailCard>
+                            <DetailCard>
+                                <DetailLabel>Title</DetailLabel>
+                                <DetailValue>{selectedApplication.applicant_title}</DetailValue>
+                            </DetailCard>
+                        </DetailGrid>
+                    </DetailSection>
+
+                    <DetailSection>
+                        <SectionTitle>Application Information</SectionTitle>
+                        <DetailGrid>
+                            <DetailCard>
+                                <DetailLabel>Job Title</DetailLabel>
+                                <DetailValue>{selectedApplication.job_title}</DetailValue>
+                            </DetailCard>
+                            <DetailCard>
+                                <DetailLabel>Applied Date</DetailLabel>
+                                <DetailValue>{new Date(selectedApplication.applied_date).toLocaleString()}</DetailValue>
+                            </DetailCard>
+                        </DetailGrid>
+                    </DetailSection>
+                </ModalBody>
+            </ModalContent>
+        </ModalOverlay>
+    )}
     </ThemeProvider>
     )
 }
@@ -454,3 +507,109 @@ const ErrorMessage = styled.div`
     text-align: center;
     padding: 20px;
 `
+
+const ModalOverlay = styled.div`
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+`
+
+const ModalContent = styled.div`
+    background-color: ${({theme}) => theme.background};
+    border-radius: 12px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+`
+
+const ModalHeader = styled.div`
+    padding: 24px;
+    border-bottom: 1px solid ${({theme}) => theme.weakBorderColor};
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: ${({theme}) => theme.color};
+
+    h2 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+`
+
+const ModalBody = styled.div`
+    padding: 24px;
+    color: ${({theme}) => theme.color};
+`
+
+const DetailSection = styled.div`
+    margin-bottom: 32px;
+    
+    &:last-child {
+        margin-bottom: 0;
+    }
+`
+
+const SectionTitle = styled.h3`
+    margin: 0 0 16px 0;
+    font-size: 1.1rem;
+    color: ${({theme}) => theme.color};
+`
+
+const DetailGrid = styled.div`
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+`
+
+const DetailCard = styled.div`
+    background-color: ${({theme}) => theme.secBackground};
+    padding: 16px;
+    border-radius: 8px;
+    transition: transform 0.2s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+    }
+`
+
+const DetailLabel = styled.div`
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: ${({theme}) => theme.secColor};
+`
+
+const DetailValue = styled.div`
+    color: ${({theme}) => theme.color};
+    font-size: 1rem;
+    word-break: break-word;
+`
+
+const CloseButton = styled.button`
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: ${({theme}) => theme.color};
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+        background-color: ${({theme}) => theme.secBackground};
+    }
+`
+

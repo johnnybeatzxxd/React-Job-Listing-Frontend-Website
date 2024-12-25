@@ -65,6 +65,6 @@ function App() {
   )
 }
 
-Modal.setAppElement('#root');
+
 
 export default App

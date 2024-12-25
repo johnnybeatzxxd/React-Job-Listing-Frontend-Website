@@ -373,6 +373,8 @@ const ModalContent = styled.div`
     max-width: 800px;
     max-height: 90vh;
     overflow-y: auto;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
     position: relative;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 `
