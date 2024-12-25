@@ -77,7 +77,15 @@ export function FavoriteJobs(){
                                     <TableCell>
                                         <JobInfo>
                                             <CompanyLogo style={{backgroundColor: '#25C277'}}>
-                                                {job.company_name?.substring(0, 2)}
+                                                {job.company_profile_image ? (
+                                                    <img 
+                                                        src={job.company_profile_image} 
+                                                        alt={job.company_name}
+                                                        style={{width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px'}}
+                                                    />
+                                                ) : (
+                                                    job.company_name?.substring(0, 2)
+                                                )}
                                             </CompanyLogo>
                                             <JobDetails>
                                                 <JobTitle>{job.company_name}</JobTitle>

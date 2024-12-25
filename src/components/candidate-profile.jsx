@@ -17,25 +17,25 @@ import { create_profile } from '../utils/auth-requests.js';
 
 export function CandidateProfileSetup({user}) {
   const [searchParams] = useSearchParams();
-  const [isDarkMode, setIsDarkMode] = useContext(Context);
+  const [isDarkMode, setIsDarkMode,profile] = useContext(Context);
   const [profileImage, setProfileImage] = useState(null);
-  const [previewImage, setPreviewImage] = useState(DefaultAvatar);
+  const [previewImage, setPreviewImage] = useState(profile?.profile_image_url || DefaultAvatar);
   const [isLoading, setIsLoading] = useState(false);
   
   const [formData, setFormData] = useState({
-    role: user.role,
-    fullName: user.fullName || '',
-    title: '',
-    country: '',
-    email: '',
-    phone: '',
-    skills: [],
-    hourlyRate: '',
-    bio: '',
-    portfolio: '',
-    github: '',
-    linkedin: '',
-    twitter: ''
+    role: user.role || 'candidate',
+    fullName: profile?.full_name || user.fullName || '',
+    title: profile?.title || '',
+    country: profile?.country || '',
+    email: profile?.email || user.email || '',
+    phone: profile?.phone || '',
+    skills: profile?.skills ? profile.skills.split(',') : [],
+    hourlyRate: profile?.hourly_rate ? parseFloat(profile.hourly_rate) : '',
+    bio: profile?.bio || '',
+    portfolio: profile?.portfolio || '',
+    github: profile?.github || '',
+    linkedin: profile?.linkedin || '',
+    twitter: profile?.twitter || ''
   });
 
   const programmingSkills = [

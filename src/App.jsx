@@ -39,6 +39,7 @@ function App() {
       }
       else {
         setProfile(data.message);
+        setUser({'fullName':data.message.full_name,'role':data.message.role})
       }
     });
   },

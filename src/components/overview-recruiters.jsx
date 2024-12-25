@@ -97,7 +97,7 @@ export function RecruitersOverView({setSelectedBar}){
             <CompanyInfoSection>
                 <HeaderRow>
                     <h3>Company Information</h3>
-                    <ViewAll onClick={()=>setSelectedBar("settings")}>Edit →</ViewAll>
+                    <ViewAll onClick={()=>window.location.href = '/set-profile'}>Edit →</ViewAll>
                 </HeaderRow>
                 <CompanyCard>
                     <CompanyHeader>

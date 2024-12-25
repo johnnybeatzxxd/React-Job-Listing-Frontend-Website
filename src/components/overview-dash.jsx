@@ -89,6 +89,34 @@ export function OverView({setSelectedBar}){
                     </StatBox>
                 </StatsContainer>
 
+                <ProfileInfoSection>
+                    <HeaderRow>
+                        <h3>Profile Information</h3>
+                        <ViewAll onClick={()=>window.location.href = '/set-profile'}>Edit →</ViewAll>
+                    </HeaderRow>
+                    <ProfileCard>
+                        <ProfileHeader>
+                            {profile.profile_image_url ? (
+                                <ProfileLogo>
+                                    <img src={profile.profile_image_url} alt={profile.full_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                </ProfileLogo>
+                            ) : (
+                                <ProfileLogo style={{backgroundColor: '#25C277'}}>{profile.full_name?.[0]}</ProfileLogo>
+                            )}
+                            <ProfileDetails>
+                                <ProfileName>{profile.full_name || 'Your Name'}</ProfileName>
+                                <ProfileMeta>
+                                    <Title>{profile.title || 'Title not set'}</Title>
+                                    <Experience>${profile.hourly_rate || 'Hourly rate not set'}/h</Experience>
+                                </ProfileMeta>
+                            </ProfileDetails>
+                        </ProfileHeader>
+                        <ProfileEmail href={`mailto:${profile.email}`}>
+                            {profile.email || 'Email not set'}
+                        </ProfileEmail>
+                    </ProfileCard>
+                </ProfileInfoSection>
+
                 <RecentlyAppliedSection>
                     <HeaderRow>
                         <h3>Recently Applied</h3>
@@ -342,5 +370,68 @@ const ErrorMessage = styled.div`
     color: red;
     text-align: center;
     padding: 20px;
+`
+
+const ProfileInfoSection = styled.div`
+    margin-top: 30px;
+    color: ${({theme})=>theme.color};
+`
+
+const ProfileCard = styled.div`
+    padding: 20px;
+    background-color: ${({theme})=>theme.secBackground};
+    border-radius: 8px;
+`
+
+const ProfileHeader = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+`
+
+const ProfileLogo = styled.div`
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    overflow: hidden;
+`
+
+const ProfileDetails = styled.div`
+    display: flex;
+    flex-direction: column;
+`
+
+const ProfileName = styled.h3`
+    margin: 0;
+    font-size: 18px;
+    color: ${({theme})=>theme.color};
+`
+
+const ProfileMeta = styled.div`
+    display: flex;
+    gap: 12px;
+    color: ${({theme})=>theme.secColor};
+    font-size: 0.9em;
+`
+
+const Title = styled.span``
+
+const Experience = styled.span`
+    color: ${({theme})=>theme.secColor};
+`
+
+const ProfileEmail = styled.a`
+    color: #0066cc;
+    text-decoration: none;
+    
+    &:hover {
+        text-decoration: underline;
+    }
 `
 

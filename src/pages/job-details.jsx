@@ -171,7 +171,15 @@ export function JobDetails() {
                         <DetailsHeader>
                             <HeaderLeft>
                                 <CompanyLogo>
-                                    <img src={BriefCase} alt="" />
+                                    {jobData.company.profile_image ? (
+                                        <img 
+                                            src={jobData.company.profile_image} 
+                                            alt={jobData.company.name}
+                                            style={{width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px'}}
+                                        />
+                                    ) : (
+                                        <img src={BriefCase} alt="" />
+                                    )}
                                 </CompanyLogo>
                                 <JobInfo>
                                     <JobTitle>{jobData.jobTitle}</JobTitle>
@@ -438,12 +446,29 @@ const HeaderLeft = styled.div`
 `
 const CompanyLogo = styled.div`
     display: flex;
+    min-width: 48px;
     width: 48px;
+    min-height: 48px;
     height: 48px;
     background: ${({ theme }) => theme.iconWrapper};
     border-radius: 8px;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    @media (max-width: 768px) {
+        min-width: 40px;
+        width: 40px;
+        min-height: 40px;
+        height: 40px;
+    }
 `
 const JobInfo = styled.div`
     display: flex;

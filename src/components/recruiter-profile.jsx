@@ -17,22 +17,22 @@ import { create_profile } from '../utils/auth-requests.js';
 
 export function RecruiterProfileSetup({user}) {
   const [searchParams] = useSearchParams();
-  const [isDarkMode, setIsDarkMode] = useContext(Context);
+  const [isDarkMode, setIsDarkMode, profile] = useContext(Context);
   const [profileImage, setProfileImage] = useState(null);
-  const [previewImage, setPreviewImage] = useState(DefaultAvatar);
+  const [previewImage, setPreviewImage] = useState(profile?.profile_image_url || DefaultAvatar);
   const [isLoading, setIsLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     role: user.role,
-    companyName: '',
-    fullName: user.fullName || '',
-    country: '',
-    companySize: '',
-    industry: '',
-    companyWebsite: '',
-    bio: '',
-    linkedin: '',
-    twitter: ''
+    companyName: profile.company_name || '',
+    fullName: profile.full_name || user.fullName || '',
+    country: profile.country || '',
+    companySize: profile.company_size || '',
+    industry: profile.industry || '',
+    companyWebsite: profile.company_website || '',
+    bio: profile.bio || '',
+    linkedin: profile.linkedin || '',
+    twitter: profile.twitter || ''
   });
 
   const companySizeOptions = [

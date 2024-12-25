@@ -134,7 +134,7 @@ export function DashboardPage(){
                     {selectedBar === "overview" && <RecruitersOverView setSelectedBar={setSelectedBar}/>}
                     {selectedBar === "postings" && <JobPostings />}
                     {selectedBar === "applications" && <Applications />}
-                    {selectedBar === "candidates" && <Candidates />}
+                    
                 </>
             );
         } else {
@@ -143,7 +143,7 @@ export function DashboardPage(){
                     {selectedBar === "overview" && <OverView setSelectedBar={setSelectedBar}/>}
                     {selectedBar === "appliedJobs" && <AppliedJobs />}
                     {selectedBar === "favorite" && <FavoriteJobs />}
-                    {selectedBar === "alert" && <JobAlerts />}
+                 
                 </>
             );
         }
